@@ -1,0 +1,10 @@
+# Stratum and agent files (kept local)
+.stratum/
+AGENTS.md
+CLAUDE.md
+OPEN-QUESTIONS.md
+PROGRESS.md
+graphify-out/
+
+ENGINEERING_PRACTICES.md
+SECURITY.md
