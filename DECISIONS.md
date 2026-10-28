@@ -2,6 +2,20 @@
 
 Newest first. Each entry is the date, the decision made and the reason for it.
 
+## 2026-10-28
+- Weekly price shifts are recorded per brand and fuel category. Each shift applies to every product in that category at every branch of that brand.
+  Reason: fuel prices are deregulated, so brands can announce different amounts or effective times. One row per brand keeps a brand that differs correct without branch overrides.
+- Stations have no price columns. Fuel categories, each brand's fuel products and the products each station sells are separate tables, and baselines, shifts and overrides are rows. The current price is computed.
+  Reason: a brand can sell several products in one category (such as Xtra 91 and 95), and each price must trace back to its records.
+- Deleting a brand is restricted, not cascaded.
+  Reason: a cascade would silently delete its stations, products and price history.
+- A station stores only its barangay. The barangay belongs to a city, and the city belongs to a province.
+  Reason: storing city and province on the station too lets the values contradict each other.
+- Names are unique within their parent: brand by name, city by province and name, barangay by city and name.
+  Reason: prevents duplicates while allowing common names such as Poblacion in different cities.
+- Prices are stored as numeric(6,2).
+  Reason: floating-point types round money values incorrectly.
+
 ## 2026-10-26
 - The app is a web app built with SvelteKit and Supabase.
   Reason: a web app reaches users without an app install, and Supabase provides the database, sign-in and access rules without a custom backend.
