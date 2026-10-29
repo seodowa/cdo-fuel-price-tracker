@@ -21,3 +21,6 @@
 - D19 (Q16): The user provides the official list of the 80 CDO barangay names; the seed build task waits for it, and a test checks the count is 80. Rejected: drafting from memory.
 - D20 (Q17): A price submission names station and product; approval creates the station_product row if missing, brand match still enforced. Rejected: product list on new-station submission.
 - D21 (Q18): Accept plan extras: observed_on not in the future, lat/lng both set or both null, text length limits, case-insensitive uniqueness for names and street addresses. Rejected: partial acceptance.
+- D22 (Q19): Account deletion: profile and submission cascade from auth.users; price_report.submitted_by and admin_log.admin_id set null. Prices stay, the person is removed. Rejected: defer, full cascade.
+- D23 (Q20): User installs the latest stable Supabase CLI release before T001; T001 pins that version. Rejected: keep 2.123.0-beta.15.
+- D24 (Q21): Acknowledged test-order exceptions: T016 cannot fail first (shift table built in T005, rules tested first in T003/T008); Playwright smoke tests deferred to screen features. Rejected: reorder phases.

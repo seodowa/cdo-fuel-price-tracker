@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Database schema for the fuel price tracker, following the 2026-10-28 entries in DECISIONS.md (locations, brands, fuel categories and products, station products, baselines, shifts per brand and category, overrides, computed current price)." Grilling decisions D1 to D14 are in `decisions.md`.
+**Input**: User description: "Database schema for the fuel price tracker, following the 2026-10-28 entries in DECISIONS.md (locations, brands, fuel categories and products, station products, baselines, shifts per brand and category, overrides, computed current price)." Grilling decisions D1 to D21 are in `decisions.md`.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -144,7 +144,6 @@ and check the log and the ban effect.
   with the same brand, barangay and street address is refused.
 - Coordinates outside the Philippines are refused. Missing coordinates are allowed.
 - Rejected, pending and withdrawn submissions count toward the 20-per-day limit.
-- A correction to a record that no longer exists is refused at approval.
 
 ## Requirements *(mandatory)*
 
@@ -221,6 +220,9 @@ and check the log and the ban effect.
 - **FR-027**: Every admin action (approve, reject, ban, unban, reference data change) MUST be
   logged with the admin, the action, the target record and the time. Only admins can read the
   log.
+- **FR-028**: Deleting an account MUST delete its profile and submissions, keep its live price
+  reports and admin log entries with the person's identity removed, and leave current prices
+  unchanged (`SECURITY.md` section 6, D22).
 
 ### Key Entities
 
@@ -233,7 +235,7 @@ and check the log and the ban effect.
 - **Price report**: a price someone saw at the pump for a station product on a date. The first
   one is the baseline, later ones are overrides. The latest is the anchor.
 - **Shift**: a weekly amount for a brand and category, with its source.
-- **Submission**: a pending, approved or rejected change from a user, with submitter and type.
+- **Submission**: a pending, approved, rejected or withdrawn change from a user, with submitter and type.
 - **Profile**: a user's account data in the app, holding the admin flag and the ban time.
 - **Admin log**: one entry per admin action.
 

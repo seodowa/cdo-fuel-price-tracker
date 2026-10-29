@@ -1,6 +1,6 @@
 # Research: Database Schema
 
-Inputs: `spec.md`, `decisions.md` (D1 to D16), constitution 1.0.0, `SECURITY.md`. No product code
+Inputs: `spec.md`, `decisions.md` (D1 to D21), constitution 1.0.0, `SECURITY.md`. No product code
 exists yet. The repository has no `supabase/` directory and no `package.json`.
 
 Open decisions were answered as D17 to D21 in `decisions.md`.
@@ -63,7 +63,7 @@ Open decisions were answered as D17 to D21 in `decisions.md`.
 - Decision: domains in `public` hold the ranges once and are reused by live tables and
   `submission` (FR-020 needs the same checks at submission time):
   - `price_php`: `numeric(6,2)` check `value between 20 and 200`
-  - `shift_php`: `numeric(4,2)` check `value between -20 and 20`
+  - `shift_php`: `numeric(5,2)` check `value between -20 and 20`
   - `latitude`: `numeric(9,6)` check `value between 4 and 22`
   - `longitude`: `numeric(9,6)` check `value between 116 and 127`
 - Rationale: one definition per range (DRY) using a native Postgres feature.
@@ -88,8 +88,7 @@ Open decisions were answered as D17 to D21 in `decisions.md`.
   - AFTER INSERT and AFTER UPDATE trigger: when the row is `approved`, applies it (insert station,
     insert price report, or update the target price report in place) and writes `admin_log`.
     `rejected` writes `admin_log`. `withdrawn` writes nothing.
-  - If application fails (duplicate station created meanwhile, duplicate price report date,
-    missing target), the statement errors and the submission stays `pending` (answers CHK011).
+  - If application fails (duplicate station created meanwhile, duplicate price report date), the statement errors and the submission stays `pending` (answers CHK011).
 - Rationale: one apply path for admin auto-approval and normal approval.
 
 ## R9. Rate limit concurrency
@@ -165,3 +164,18 @@ Open decisions were answered as D17 to D21 in `decisions.md`.
 
 - Accepted: `observed_on` not after Manila today (R8), latitude and longitude both set or both
   null, text bounds (R11), case-insensitive uniqueness (R11).
+
+## R19. Account deletion (D22, FR-028)
+
+- Decision: deleting an `auth.users` row cascades to `profile` (`profile.id → auth.users on delete
+  cascade`) and to that person's `submission` rows (`submission.submitted_by → profile on delete
+  cascade`). These references become nullable and `on delete set null`:
+  `price_report.submitted_by`, `admin_log.admin_id`, `submission.decided_by`. Every other foreign
+  key stays `on delete restrict`.
+- Effect: live prices and the admin log survive. The person's identity is removed. `current_price`
+  is unchanged because it never reads `submitted_by`.
+- The `submission` check on `decided_by` becomes `decided_by is null or status in ('approved','rejected')`
+  so a deleted admin does not break decided rows.
+- The column grant from R4 is unchanged. `submitted_by` stays hidden from `anon` and `authenticated`
+  whether it holds a value or null.
+- Rejected: deferring deletion, cascading everything (would delete live prices).

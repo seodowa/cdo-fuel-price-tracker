@@ -1,7 +1,8 @@
 # Data Model: Database Schema
 
 All tables live in `public` with RLS enabled. Every id is `bigint generated always as identity`
-unless noted. Every foreign key is `on delete restrict` (FR-004). Domains are defined in
+unless noted. Every foreign key is `on delete restrict` (FR-004) except the account-deletion
+keys listed in research R19 (D22). Domains are defined in
 `research.md` R6. Text bounds follow R11.
 
 ## Location
@@ -35,7 +36,7 @@ The lat/lng pair check is a plan addition accepted as D21.
 
 | Table | Fields | Constraints |
 |---|---|---|
-| `price_report` | `id`, `station_product_id → station_product`, `price price_php not null`, `observed_on date not null`, `submitted_by uuid not null → profile` | unique `(station_product_id, observed_on)` (FR-010, D15, D16) |
+| `price_report` | `id`, `station_product_id → station_product`, `price price_php not null`, `observed_on date not null`, `submitted_by uuid null → profile on delete set null` | unique `(station_product_id, observed_on)` (FR-010, D15, D16). Null only after the submitter's account is deleted |
 | `price_shift` | `id`, `brand_id → brand`, `category_id → fuel_category`, `amount shift_php not null`, `effective_on date not null`, `source_ref text not null`, `fetched_at timestamptz not null`, `extractor text not null` | unique `(brand_id, category_id, effective_on)` (FR-012) |
 
 The first report of a station product is its baseline. Later reports are overrides. The report
@@ -57,19 +58,19 @@ Derivation rule: `research.md` R5. No submitter column.
 
 | Table | Fields | Constraints |
 |---|---|---|
-| `profile` | `id uuid` PK `→ auth.users(id)`, `is_admin boolean not null default false`, `banned_at timestamptz null`, `created_at timestamptz not null default now()` | row created by trigger on `auth.users` (R3) |
-| `admin_log` | `id`, `admin_id uuid not null → profile`, `action text not null`, `target_table text not null`, `target_id text not null`, `created_at timestamptz not null default now()` | check `action in ('approve','reject','ban','unban','create','update','delete')` |
+| `profile` | `id uuid` PK `→ auth.users(id) on delete cascade`, `is_admin boolean not null default false`, `banned_at timestamptz null`, `created_at timestamptz not null default now()` | row created by trigger on `auth.users` (R3) |
+| `admin_log` | `id`, `admin_id uuid null → profile on delete set null`, `action text not null`, `target_table text not null`, `target_id text not null`, `created_at timestamptz not null default now()` | check `action in ('approve','reject','ban','unban','create','update','delete')` |
 
 ### `submission`
 
 | Field | Type | Set by |
 |---|---|---|
 | `id` | bigint identity | database |
-| `submitted_by` | `uuid not null → profile`, default `auth.uid()` | trigger forces `auth.uid()` |
+| `submitted_by` | `uuid not null → profile on delete cascade`, default `auth.uid()` | trigger forces `auth.uid()` |
 | `kind` | `text not null` check `in ('station','price','correction')` | client |
 | `status` | `text not null default 'pending'` check `in ('pending','approved','rejected','withdrawn')` | trigger, then status update |
 | `created_at` | `timestamptz not null default now()` | database |
-| `decided_by` | `uuid null → profile` | trigger |
+| `decided_by` | `uuid null → profile on delete set null` | trigger |
 | `decided_at` | `timestamptz null` | trigger |
 | `name`, `brand_id → brand`, `barangay_id → barangay`, `street_address`, `latitude latitude`, `longitude longitude` | station kind | client |
 | `price price_php`, `observed_on date` | price and correction kinds | client |
@@ -82,7 +83,8 @@ Checks:
   `station_id`, `product_id`, `price`, `observed_on`. Correction kind: `price_report_id`, `price`,
   `observed_on`.
 - `(status = 'pending') = (decided_at is null)`.
-- `(status in ('approved','rejected')) = (decided_by is not null)`.
+- `decided_by is null or status in ('approved','rejected')`. The trigger always sets `decided_by` on
+  approve and reject. The check allows null because deleting the admin's account sets it null (D22).
 
 Index: `(submitted_by, created_at)` for the daily limit.
 
