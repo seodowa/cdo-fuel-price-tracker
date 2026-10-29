@@ -16,3 +16,8 @@
 - D14 (Q13): Done = migrations apply on fresh local Supabase, seed loads, pgTAP passes (price math, CHECK ranges, RLS per table, daily limit, approval apply), Supabase security advisor clean. Rejected: skip advisor.
 - D15: Index baselines and overrides on (station_product_id, observed_on); shifts use the FR-012 unique index on (brand_id, category_id, effective_on). History is computed from these rows, no history table. For the plan.
 - D16: Baselines and overrides merge into one price_report table, unique on (station_product_id, observed_on). First report is the baseline, the latest is the anchor. Same-day changes go through correction. Submission kinds: station, price, correction. Rejected: price_observation, price_override names, two tables.
+- D17 (Q14): Supabase CLI installed system-wide by the user, version pinned in quickstart.md. No package.json in this feature. Rejected: npm devDependency.
+- D18 (Q15): Docker Engine (installed, user in docker group) runs the local stack; daemon must be started before Build. Rejected: Podman.
+- D19 (Q16): The user provides the official list of the 80 CDO barangay names; the seed build task waits for it, and a test checks the count is 80. Rejected: drafting from memory.
+- D20 (Q17): A price submission names station and product; approval creates the station_product row if missing, brand match still enforced. Rejected: product list on new-station submission.
+- D21 (Q18): Accept plan extras: observed_on not in the future, lat/lng both set or both null, text length limits, case-insensitive uniqueness for names and street addresses. Rejected: partial acceptance.
