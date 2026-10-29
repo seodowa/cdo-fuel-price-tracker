@@ -63,7 +63,7 @@ check live records and current prices.
 2. **Given** a pending baseline, **When** an admin approves it, **Then** it becomes the live
    baseline and current prices reflect it.
 3. **Given** a pending correction to a live override, **When** an admin approves it, **Then** the
-   existing override record holds the corrected value and no new override record exists.
+   existing price report holds the corrected value and no new price report exists.
 4. **Given** a pending submission, **When** an admin rejects it, **Then** live records and prices
    are unchanged.
 5. **Given** a user with 20 submissions today, **When** they submit again, **Then** it is refused.
@@ -132,10 +132,12 @@ and check the log and the ban effect.
 - A shift dated the same day as the anchor baseline or override does not apply to it. Only shifts
   dated after the anchor apply.
 - Several shifts on different dates since the anchor all add up.
-- When a station product has both baselines and overrides, the anchor is the one with the latest
-  observed date, whichever kind it is. On the same date, the override wins.
+- The first price report for a station product is its baseline. Later reports are overrides. Both
+  are price reports, and the anchor is the report with the latest observed date.
+- A second price report for the same station product and observed date is refused. A change to
+  that day's price is submitted as a correction.
 - A shift dated in the future does not apply until its effective date.
-- The 20.00 to 200.00 range applies to stored baselines and overrides. The computed price is not
+- The 20.00 to 200.00 range applies to stored price reports. The computed price is not
   range-checked.
 - A barangay named "Poblacion" can exist in two cities, but not twice in one city.
 - Two stations of one brand in one barangay are told apart by street address. A second station
@@ -174,8 +176,8 @@ and check the log and the ban effect.
 
 **Prices**
 
-- **FR-010**: Baselines and overrides MUST each be stored as their own records per station
-  product, with the price, the date it was observed and the submitter.
+- **FR-010**: Baselines and overrides MUST be stored as price reports, one record per station
+  product per observed date, with the price, the observed date and the submitter.
 - **FR-011**: Prices MUST be stored as exact decimal amounts with two decimal places and MUST be
   between 20.00 and 200.00 per liter.
 - **FR-012**: Shifts MUST be stored per brand, fuel category and effective date, with amount,
@@ -183,16 +185,15 @@ and check the log and the ban effect.
   category and effective date.
 - **FR-013**: Shift amounts MUST be between -20.00 and +20.00.
 - **FR-014**: The current price of a station product MUST be computed when read, never stored. It
-  equals the price of its most recent approved baseline or override (the anchor, override winning
-  on the same date) plus the sum of shifts for its brand and category dated after the anchor and
+  equals the price of its most recent approved price report (the anchor) plus the sum of shifts for its brand and category dated after the anchor and
   on or before today.
 - **FR-015**: Each current price MUST return the anchor date (reported at), the date of the latest
   applied shift or nothing (shifted at), and whether any shift applied (is estimate).
 
 **Submissions and approval**
 
-- **FR-016**: A signed-in, non-banned user MUST be able to submit a new station, a baseline, an
-  override, or a correction to an existing baseline or override. Each submission is stored as
+- **FR-016**: A signed-in, non-banned user MUST be able to submit a new station, a price
+  report (baseline or override), or a correction to an existing price report. Each submission is stored as
   pending.
 - **FR-017**: Pending, rejected and withdrawn submissions MUST NOT change any live record or
   current price.
@@ -200,8 +201,8 @@ and check the log and the ban effect.
   to edit it.
 - **FR-017b**: An admin's submission MUST be approved automatically when submitted, is still
   stored and logged as a submission, and does not count toward the daily limit.
-- **FR-018**: Admin approval MUST apply a submission: a new station, baseline or override becomes
-  a live record, and a correction updates the existing record in place.
+- **FR-018**: Admin approval MUST apply a submission: a new station or price report becomes a
+  live record, and a correction updates the existing record in place.
 - **FR-019**: The data layer MUST refuse a 21st submission by one non-admin account within one
   calendar day (Asia/Manila), counting pending, approved, rejected and withdrawn submissions.
 - **FR-020**: Submitted values MUST pass the same range and reference checks as live records
@@ -229,9 +230,8 @@ and check the log and the ban effect.
 - **Fuel product**: a brand's product in a category, such as Petron Xtra 91 (gasoline).
 - **Station**: one branch of a brand in a barangay, with street address and optional coordinates.
 - **Station product**: a product a station sells.
-- **Baseline**: an observed price for a station product, collected once.
-- **Override**: an observed price for a station product that differs from the shifted estimate.
-  It becomes the new anchor.
+- **Price report**: a price someone saw at the pump for a station product on a date. The first
+  one is the baseline, later ones are overrides. The latest is the anchor.
 - **Shift**: a weekly amount for a brand and category, with its source.
 - **Submission**: a pending, approved or rejected change from a user, with submitter and type.
 - **Profile**: a user's account data in the app, holding the admin flag and the ban time.

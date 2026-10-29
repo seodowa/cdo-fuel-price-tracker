@@ -15,3 +15,4 @@
 - D13 (Q12): profile table with banned_at; RLS blocks submissions from banned accounts; admins set/clear it, logged. Rejected: no bans.
 - D14 (Q13): Done = migrations apply on fresh local Supabase, seed loads, pgTAP passes (price math, CHECK ranges, RLS per table, daily limit, approval apply), Supabase security advisor clean. Rejected: skip advisor.
 - D15: Index baselines and overrides on (station_product_id, observed_on); shifts use the FR-012 unique index on (brand_id, category_id, effective_on). History is computed from these rows, no history table. For the plan.
+- D16: Baselines and overrides merge into one price_report table, unique on (station_product_id, observed_on). First report is the baseline, the latest is the anchor. Same-day changes go through correction. Submission kinds: station, price, correction. Rejected: price_observation, price_override names, two tables.
