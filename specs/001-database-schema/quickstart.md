@@ -9,7 +9,7 @@ Proves SC-005 (one-step install), SC-001 to SC-004 (pgTAP) and SC-006 (advisor).
    sudo systemctl enable --now docker
    docker info --format '{{.ServerVersion}}'
    ```
-2. Supabase CLI installed system-wide (D17). Pinned version: `<filled by T001 from supabase --version>`.
+2. Supabase CLI installed system-wide (D17). Pinned version: `2.122.0`.
    It must be a stable release with no `-beta` suffix (D23). Check with `supabase --version`. A different version is a mismatch to raise before Build.
 
 ## Run

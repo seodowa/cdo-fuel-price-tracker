@@ -19,8 +19,8 @@ description: "Task list for the database schema feature"
 
 ## Phase 1: Setup
 
-- [ ] T001 Confirm `docker info` works (start with `sudo systemctl enable --now docker`, D18) and `supabase --version` works (D17). Confirm the version has no `-beta` suffix (latest stable, D23); if it does, stop and ask the user to install the stable release. Write the exact version into the "Pinned version" line of `specs/001-database-schema/quickstart.md`
-- [ ] T002 Run `supabase init` to create `supabase/config.toml` (and the CLI's own `supabase/.gitignore`). Confirm `[db] major_version` in `supabase/config.toml` is 15 or later. No `package.json` (D17)
+- [x] T001 Confirm `docker info` works (start with `sudo systemctl enable --now docker`, D18) and `supabase --version` works (D17). Confirm the version has no `-beta` suffix (latest stable, D23); if it does, stop and ask the user to install the stable release. Write the exact version into the "Pinned version" line of `specs/001-database-schema/quickstart.md`
+- [x] T002 Run `supabase init` to create `supabase/config.toml` (and the CLI's own `supabase/.gitignore`). Confirm `[db] major_version` in `supabase/config.toml` is 15 or later. No `package.json` (D17)
 
 ---
 
