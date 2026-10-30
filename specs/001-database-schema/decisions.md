@@ -24,3 +24,4 @@
 - D22 (Q19): Account deletion: profile and submission cascade from auth.users; price_report.submitted_by and admin_log.admin_id set null. Prices stay, the person is removed. Rejected: defer, full cascade.
 - D23 (Q20): User installs the latest stable Supabase CLI release before T001; T001 pins that version. Rejected: keep 2.123.0-beta.15.
 - D24 (Q21): Acknowledged test-order exceptions: T016 cannot fail first (shift table built in T005, rules tested first in T003/T008); Playwright smoke tests deferred to screen features. Rejected: reorder phases.
+- D25 (Q22): Seed the 80 barangays from the user-provided list, dropping Calaanan (part of Canito-an, not a separate barangay). Rejected: seed 81.
