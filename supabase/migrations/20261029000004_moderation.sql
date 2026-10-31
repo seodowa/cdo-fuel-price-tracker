@@ -14,12 +14,35 @@ to authenticated;
 grant select, update (banned_at) on public.profile to authenticated;
 grant select on public.admin_log to authenticated;
 
-create policy admin_write on public.province for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
-create policy admin_write on public.city for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
-create policy admin_write on public.barangay for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
-create policy admin_write on public.brand for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
-create policy admin_write on public.fuel_category for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
-create policy admin_write on public.fuel_product for all to authenticated using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy admin_insert on public.province for insert to authenticated with check ((select private.is_admin()));
+create policy admin_update on public.province for update to authenticated
+  using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy admin_delete on public.province for delete to authenticated using ((select private.is_admin()));
+
+create policy admin_insert on public.city for insert to authenticated with check ((select private.is_admin()));
+create policy admin_update on public.city for update to authenticated
+  using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy admin_delete on public.city for delete to authenticated using ((select private.is_admin()));
+
+create policy admin_insert on public.barangay for insert to authenticated with check ((select private.is_admin()));
+create policy admin_update on public.barangay for update to authenticated
+  using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy admin_delete on public.barangay for delete to authenticated using ((select private.is_admin()));
+
+create policy admin_insert on public.brand for insert to authenticated with check ((select private.is_admin()));
+create policy admin_update on public.brand for update to authenticated
+  using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy admin_delete on public.brand for delete to authenticated using ((select private.is_admin()));
+
+create policy admin_insert on public.fuel_category for insert to authenticated with check ((select private.is_admin()));
+create policy admin_update on public.fuel_category for update to authenticated
+  using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy admin_delete on public.fuel_category for delete to authenticated using ((select private.is_admin()));
+
+create policy admin_insert on public.fuel_product for insert to authenticated with check ((select private.is_admin()));
+create policy admin_update on public.fuel_product for update to authenticated
+  using ((select private.is_admin())) with check ((select private.is_admin()));
+create policy admin_delete on public.fuel_product for delete to authenticated using ((select private.is_admin()));
 
 create policy admin_update on public.profile for update to authenticated
   using ((select private.is_admin())) with check ((select private.is_admin()));
