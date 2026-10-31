@@ -83,6 +83,8 @@ create table public.price_report (
   unique (station_product_id, observed_on)
 );
 
+create index price_report_submitted_by_idx on public.price_report (submitted_by);
+
 create table public.price_shift (
   id bigint generated always as identity primary key,
   brand_id bigint not null references public.brand on delete restrict,

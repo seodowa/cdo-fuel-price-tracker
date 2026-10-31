@@ -53,6 +53,7 @@ Open decisions were answered as D17 to D21 in `decisions.md`.
   `effective_on > anchor.observed_on` and `effective_on <= (now() at time zone 'Asia/Manila')::date`.
   Columns: `price = anchor.price + coalesce(sum(amount), 0)`, `reported_at = anchor.observed_on`,
   `shifted_at = max(effective_on)` or null, `is_estimate = shifted_at is not null`.
+- The anchor ignores reports with `observed_on` after Manila today, so a future-dated report never sets the price.
 - Station products with no report produce no row, so a missing price is never shown as 0.
 - The computed price is not range-checked (spec edge case).
 - Tests use dates relative to Manila today (for example anchor = today minus 14) so the view needs

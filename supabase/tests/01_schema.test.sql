@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(124);
+select plan(125);
 
 select has_table('public', t, t) from unnest(array[
   'province', 'city', 'barangay', 'brand', 'fuel_category', 'fuel_product',
@@ -268,6 +268,15 @@ select results_eq(
   $$ select is_admin, banned_at is null from public.profile where id = '00000000-0000-4000-8000-000000000001' $$,
   $$ values (false, true) $$,
   'R3: new auth user gets a profile with is_admin false and no ban'
+);
+
+select ok(
+  exists (
+    select 1 from pg_index i
+    join pg_attribute a on a.attrelid = i.indrelid and a.attnum = i.indkey[0]
+    where i.indrelid = 'public.price_report'::regclass and a.attname = 'submitted_by'
+  ),
+  'price_report has an index leading on submitted_by'
 );
 
 select * from finish();

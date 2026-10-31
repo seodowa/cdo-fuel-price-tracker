@@ -31,6 +31,7 @@ cross join lateral (
   select pr.price, pr.observed_on
   from public.price_report pr
   where pr.station_product_id = sp.id
+    and pr.observed_on <= (now() at time zone 'Asia/Manila')::date
   order by pr.observed_on desc
   limit 1
 ) r

@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(11);
+select plan(12);
 
 create function pg_temp.d(n int) returns date language sql as $$
   select (now() at time zone 'Asia/Manila')::date + n
@@ -97,6 +97,10 @@ select pg_temp.sp('Test Brand E4', 'diesel', 'E4 Diesel');
 select pg_temp.report('E4 Diesel', 195.00, -6);
 select pg_temp.shift('Test Brand E4', 'diesel', 10.00, -2);
 
+select pg_temp.sp('Test Brand E5', 'diesel', 'E5 Diesel');
+select pg_temp.report('E5 Diesel', 60.00, -3);
+select pg_temp.report('E5 Diesel', 70.00, 1);
+
 select results_eq(
   $$ select * from pg_temp.cp('S1 Gas') $$,
   $$ values (60.70::numeric, pg_temp.d(-14), pg_temp.d(-1), true) $$,
@@ -151,6 +155,12 @@ select results_eq(
   $$ select * from pg_temp.cp('E4 Diesel') $$,
   $$ values (205.00::numeric, pg_temp.d(-6), pg_temp.d(-2), true) $$,
   'FR-014 edge: computed price above 200 is returned unchecked'
+);
+
+select results_eq(
+  $$ select * from pg_temp.cp('E5 Diesel') $$,
+  $$ values (60.00::numeric, pg_temp.d(-3), null::date, false) $$,
+  'FR-014 edge: report dated tomorrow is not used as the anchor'
 );
 
 select isnt_empty(
