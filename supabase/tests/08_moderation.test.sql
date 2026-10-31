@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(39);
+select plan(44);
 
 insert into public.province (name) values ('Mod Province');
 insert into public.city (province_id, name)
@@ -144,6 +144,9 @@ select pg_temp.login('84');
 select is(pg_temp.user_crud('brand'), 'refused refused refused', 'R2: banned admin cannot manage reference data');
 select is(pg_temp.refused(format('update public.profile set banned_at = now() where id = %L', pg_temp.s('target'))),
   'refused', 'R2: banned admin cannot ban');
+select is(pg_temp.rows('select count(*) from public.admin_log'), '(0)', 'R2: banned admin reads no admin_log rows');
+select is(pg_temp.rows('select id from public.profile'), '(00000000-0000-4000-8000-000000000084)',
+  'R2: banned admin reads only their own profile');
 
 select pg_temp.login('81');
 select is(pg_temp.crud('province'), '1,1', 'FR-024: admin inserts, updates and deletes a province');
@@ -209,6 +212,9 @@ reset role;
 select set_config('request.jwt.claims', '', true);
 set local role anon;
 select throws_ok('select count(*) from public.admin_log', '42501', null, 'FR-027: anon cannot read admin_log');
+select throws_ok($q$ insert into public.province (name) values ('Mod Anon Province') $q$, '42501', null, 'FR-024: anon cannot insert a province');
+select throws_ok($q$ update public.province set name = 'Mod Anon Renamed' $q$, '42501', null, 'FR-024: anon cannot update a province');
+select throws_ok($q$ delete from public.province $q$, '42501', null, 'FR-024: anon cannot delete a province');
 reset role;
 
 select * from finish();
