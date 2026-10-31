@@ -30,6 +30,11 @@ exist (research R1). Field types and checks are in `data-model.md`.
 Any column outside "Allowed columns" fails with 42501. `submitted_by`, `status` on insert,
 `decided_by` and `decided_at` are set by the database.
 A submitter can read `decided_by` on their own submissions (accepted).
+"Admin" means `is_admin` is true and the account is not banned.
+A non-admin setting `approved` or `rejected` on their own pending row, or a non-submitter setting
+`withdrawn`, fails with P0001 `not_allowed`. Other users' rows are hidden by RLS, so a non-admin
+update of them affects 0 rows without an error. An update that keeps the same status changes
+nothing.
 
 ## Errors
 
@@ -38,7 +43,7 @@ A submitter can read `decided_by` on their own submissions (accepted).
 | 42501 | role, RLS or column grant refused the action (anonymous submit, shift by user) |
 | 23514 | range or shape check failed (price, shift, coordinates, text bounds, kind fields) |
 | 23502 | required field missing (for example shift source fields) |
-| 23505 | duplicate (station, price report per date, shift per brand/category/date, names) |
+| 23505 | duplicate (station, price report per date, shift per brand/category/date, names). Also raised on approval when the station or report date was created meanwhile. The submission stays pending |
 | 23503 | referenced row missing, or delete of a referenced row refused |
 | P0001 | trigger refusal. Message is one of `banned`, `daily_limit`, `duplicate_station`, `brand_mismatch`, `future_date`, `not_pending`, `not_allowed` |
 

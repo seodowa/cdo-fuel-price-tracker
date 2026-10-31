@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Database schema for the fuel price tracker, following the 2026-10-28 entries in DECISIONS.md (locations, brands, fuel categories and products, station products, baselines, shifts per brand and category, overrides, computed current price)." Grilling decisions D1 to D21 are in `decisions.md`.
+**Input**: User description: "Database schema for the fuel price tracker, following the 2026-10-28 entries in DECISIONS.md (locations, brands, fuel categories and products, station products, baselines, shifts per brand and category, overrides, computed current price)." Grilling decisions D1 to D25 are in `decisions.md`.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -137,6 +137,7 @@ and check the log and the ban effect.
 - A second price report for the same station product and observed date is refused. A change to
   that day's price is submitted as a correction.
 - A shift dated in the future does not apply until its effective date.
+- A price report dated in the future is not used as the anchor until its observed date.
 - The 20.00 to 200.00 range applies to stored price reports. The computed price is not
   range-checked.
 - A barangay named "Poblacion" can exist in two cities, but not twice in one city.
@@ -160,8 +161,8 @@ and check the log and the ban effect.
   unique by brand and name.
 - **FR-004**: Deleting a brand, category, product or location that other records use MUST be
   refused.
-- **FR-005**: Seed data MUST load Misamis Oriental, Cagayan de Oro, its 80 barangays and the three
-  fuel categories.
+- **FR-005**: Seed data MUST load Misamis Oriental, Cagayan de Oro, its 80 barangays (D25) and the
+  three fuel categories.
 
 **Stations**
 
@@ -184,7 +185,7 @@ and check the log and the ban effect.
   category and effective date.
 - **FR-013**: Shift amounts MUST be between -20.00 and +20.00.
 - **FR-014**: The current price of a station product MUST be computed when read, never stored. It
-  equals the price of its most recent approved price report (the anchor) plus the sum of shifts for its brand and category dated after the anchor and
+  equals the price of its most recent approved price report observed on or before today (the anchor) plus the sum of shifts for its brand and category dated after the anchor and
   on or before today.
 - **FR-015**: Each current price MUST return the anchor date (reported at), the date of the latest
   applied shift or nothing (shifted at), and whether any shift applied (is estimate).
@@ -216,7 +217,8 @@ and check the log and the ban effect.
 - **FR-024**: Only admins MUST be able to approve or reject submissions, manage reference data,
   ban and unban accounts, and read all submissions.
 - **FR-025**: Only the trusted server process MUST be able to record shifts.
-- **FR-026**: A banned account MUST NOT be able to submit. Admins set and clear bans.
+- **FR-026**: A banned account MUST NOT be able to submit. Admins set and clear bans. A banned
+  admin has no admin rights.
 - **FR-027**: Every admin action (approve, reject, ban, unban, reference data change) MUST be
   logged with the admin, the action, the target record and the time. Only admins can read the
   log.
@@ -265,3 +267,5 @@ and check the log and the ban effect.
 - A shift's effective date is a date, not a time of day. Same-day timing differences between
   brands are ignored.
 - Test data uses invented stations, users and prices.
+- Writes made without a signed-in user (seed, migrations, the service role) are not admin actions
+  and are not logged in the admin log.

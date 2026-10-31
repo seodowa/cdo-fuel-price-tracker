@@ -4,7 +4,7 @@
 
 **Input**: Feature specification from `specs/001-database-schema/spec.md`
 
-**Status**: Phase 0 and Phase 1 complete. Open decisions resolved as D17 to D21.
+**Status**: Phase 0 and Phase 1 complete. Open decisions resolved as D17 to D25.
 
 ## Summary
 
@@ -17,10 +17,10 @@ seed file and pgTAP tests. No SvelteKit code.
 
 ## Technical Context
 
-**Language/Version**: SQL (PL/pgSQL) on Supabase local Postgres. Major version comes from the CLI
-default in `supabase/config.toml`, 15 or later required (R15).
+**Language/Version**: SQL (PL/pgSQL) on Supabase local Postgres 17 (`[db] major_version` in
+`supabase/config.toml`), 15 or later required (R15).
 
-**Primary Dependencies**: Supabase CLI, installed system-wide and pinned in quickstart.md (D17), Docker Engine (D18), pgTAP (bundled with the Supabase
+**Primary Dependencies**: Supabase CLI, installed system-wide and pinned at `2.122.0` in quickstart.md (D17, D23), Docker Engine (D18), pgTAP (bundled with the Supabase
 Postgres image, enabled in tests).
 
 **Storage**: Supabase Postgres.
@@ -102,7 +102,7 @@ supabase/
 │   ├── 20261029000002_public_read.sql           # public read grants and policies, current_price view
 │   ├── 20261029000003_submissions.sql           # submission table, triggers, policies, profile read
 │   └── 20261029000004_moderation.sql            # admin reference-data writes, ban, logging triggers
-├── seed.sql                                     # Misamis Oriental, Cagayan de Oro, 80 barangays (list from user, D19), 3 categories
+├── seed.sql                                     # Misamis Oriental, Cagayan de Oro, 80 barangays (list from user, D19, Calaanan dropped, D25), 3 categories
 └── tests/
     ├── 01_schema.test.sql
     ├── 02_seed.test.sql

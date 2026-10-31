@@ -3,7 +3,7 @@
 Inputs: `spec.md`, `decisions.md` (D1 to D21), constitution 1.0.0, `SECURITY.md`. No product code
 exists yet. The repository has no `supabase/` directory and no `package.json`.
 
-Open decisions were answered as D17 to D21 in `decisions.md`.
+Open decisions were answered as D17 to D25 in `decisions.md`.
 
 ## R1. Write path: table writes with RLS, column grants and triggers
 
@@ -80,17 +80,19 @@ Open decisions were answered as D17 to D21 in `decisions.md`.
 ## R8. Approval and application
 
 - Decision:
-  - BEFORE INSERT trigger on `submission`: forces `submitted_by = auth.uid()`, refuses banned
+  - BEFORE INSERT trigger on `submission`: sets `submitted_by = auth.uid()` (the column has no
+    default), refuses banned
     accounts, locks the submitter's profile row and refuses a 21st submission that Manila day for
     non-admins (FR-019), runs submission-time checks that a constraint cannot express (FR-007
     duplicate station, FR-009 brand match, `observed_on` not in the future), and for admins sets
     `status = 'approved'` (FR-017b).
   - BEFORE UPDATE trigger: only `pending` rows change. `approved`/`rejected` need an admin.
-    `withdrawn` needs the submitter. Sets `decided_by` and `decided_at`.
+    `withdrawn` needs the submitter. Sets `decided_by` and `decided_at`. Any other status change
+    raises P0001 `not_allowed`. Both UPDATE triggers fire only when `status` changes.
   - AFTER INSERT and AFTER UPDATE trigger: when the row is `approved`, applies it (insert station,
     insert price report, or update the target price report in place) and writes `admin_log`.
     `rejected` writes `admin_log`. `withdrawn` writes nothing.
-  - If application fails (duplicate station created meanwhile, duplicate price report date), the statement errors and the submission stays `pending` (answers CHK011).
+  - If application fails (duplicate station created meanwhile, duplicate price report date), the statement fails with 23505 and the submission stays `pending` (answers CHK011).
 - Rationale: one apply path for admin auto-approval and normal approval.
 
 ## R9. Rate limit concurrency
@@ -121,13 +123,16 @@ Open decisions were answered as D17 to D21 in `decisions.md`.
 - Rationale: Supabase default privileges grant all on new `public` tables to `anon` and
   `authenticated`. RLS already denies, but explicit grants are defence in depth and fix the column
   rules of R4 and R1.
+- Admin writes on the six reference tables use one policy per command (`admin_insert`,
+  `admin_update`, `admin_delete`), not one `for all` policy, which would also add a second
+  select policy next to `public_read`.
 
 ## R13. Admin log
 
 - Decision: `admin_log (id, admin_id, action, target_table, target_id text, created_at)`. Actions:
   `approve`, `reject`, `ban`, `unban`, `create`, `update`, `delete`. Written only by SECURITY
-  DEFINER trigger functions. Reference-data triggers log only when `auth.uid()` is not null, so
-  seed and migrations do not create log rows. Admins read it. Nobody updates or deletes it through
+  DEFINER trigger functions. Reference-data and ban/unban triggers log only when `auth.uid()` is
+  not null, so seed, migrations and service-role writes do not create log rows. Admins read it. Nobody updates or deletes it through
   the API.
 
 ## R14. Tests
@@ -146,12 +151,14 @@ Open decisions were answered as D17 to D21 in `decisions.md`.
   feature. Docker Engine runs the local stack (the user is in the `docker` group). The daemon is
   disabled today, so it is started with `sudo systemctl enable --now docker`. Podman is not used.
 - The Postgres major version is the one `supabase init` writes to `supabase/config.toml`
-  (`[db] major_version`). Views with `security_invoker` need 15 or later.
+  (`[db] major_version`), which is 17. Views with `security_invoker` need 15 or later.
+- Pinned CLI: `2.122.0`, a stable release (D23).
 
-## R16. Seed barangay names (D19)
+## R16. Seed barangay names (D19, D25)
 
 - Decision: the user provides the official list of the 80 Cagayan de Oro barangay names. The seed
   task waits for that list and does not draft names. `02_seed.test.sql` checks the count is 80.
+- The user's list had 81 names. Calaanan is dropped because it is part of Canito-an (D25).
 
 ## R17. Station products come from approved price submissions (D20)
 
@@ -174,6 +181,8 @@ Open decisions were answered as D17 to D21 in `decisions.md`.
   cascade`). These references become nullable and `on delete set null`:
   `price_report.submitted_by`, `admin_log.admin_id`, `submission.decided_by`. Every other foreign
   key stays `on delete restrict`.
+- Index `price_report_submitted_by_idx` on `price_report (submitted_by)` keeps the set-null step
+  from scanning the table. `submission` is covered by its `(submitted_by, created_at)` index.
 - Effect: live prices and the admin log survive. The person's identity is removed. `current_price`
   is unchanged because it never reads `submitted_by`.
 - The `submission` check on `decided_by` becomes `decided_by is null or status in ('approved','rejected')`

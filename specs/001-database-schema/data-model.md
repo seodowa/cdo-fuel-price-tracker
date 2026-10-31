@@ -36,7 +36,7 @@ The lat/lng pair check is a plan addition accepted as D21.
 
 | Table | Fields | Constraints |
 |---|---|---|
-| `price_report` | `id`, `station_product_id → station_product`, `price price_php not null`, `observed_on date not null`, `submitted_by uuid null → profile on delete set null` | unique `(station_product_id, observed_on)` (FR-010, D15, D16). Null only after the submitter's account is deleted |
+| `price_report` | `id`, `station_product_id → station_product`, `price price_php not null`, `observed_on date not null`, `submitted_by uuid null → profile on delete set null` | unique `(station_product_id, observed_on)` (FR-010, D15, D16), index `price_report_submitted_by_idx` on `submitted_by`. Null only after the submitter's account is deleted |
 | `price_shift` | `id`, `brand_id → brand`, `category_id → fuel_category`, `amount shift_php not null`, `effective_on date not null`, `source_ref text not null`, `fetched_at timestamptz not null`, `extractor text not null` | unique `(brand_id, category_id, effective_on)` (FR-012) |
 
 The first report of a station product is its baseline. Later reports are overrides. The report
@@ -66,7 +66,7 @@ Derivation rule: `research.md` R5. No submitter column.
 | Field | Type | Set by |
 |---|---|---|
 | `id` | bigint identity | database |
-| `submitted_by` | `uuid not null → profile on delete cascade`, default `auth.uid()` | trigger forces `auth.uid()` |
+| `submitted_by` | `uuid not null → profile on delete cascade`, no default | BEFORE INSERT trigger sets `auth.uid()` |
 | `kind` | `text not null` check `in ('station','price','correction')` | client |
 | `status` | `text not null default 'pending'` check `in ('pending','approved','rejected','withdrawn')` | trigger, then status update |
 | `created_at` | `timestamptz not null default now()` | database |
@@ -96,8 +96,15 @@ insert (admin)     -> approved (applied and logged at once)
 pending -> approved   admin only, applies, logs 'approve'
 pending -> rejected   admin only, logs 'reject'
 pending -> withdrawn  submitter only
-approved, rejected, withdrawn -> (no change allowed)
+approved, rejected, withdrawn -> (no change allowed, P0001 not_pending)
 ```
+
+- The BEFORE UPDATE and AFTER UPDATE triggers fire only when `status` changes. An update that
+  keeps the same status changes nothing.
+- A non-admin who sets `approved` or `rejected` on their own pending row, or anyone other than the
+  submitter who sets `withdrawn`, gets P0001 `not_allowed`.
+- If applying an approval hits a unique constraint (station or price report date created
+  meanwhile), the update fails with 23505 and the submission stays `pending`.
 
 ### Application on approval
 
@@ -119,3 +126,8 @@ approved, rejected, withdrawn -> (no change allowed)
 | `submission` | none | read own, insert (not banned), withdraw own pending | read all, approve, reject | all |
 | `profile` | none | read own | read all, update `banned_at` (logged) | all |
 | `admin_log` | none | none | read | all |
+
+Admin means `private.is_admin()`: `is_admin` is true and `banned_at` is null, so a banned admin has
+no admin rights. Each reference table has one admin policy per command (`admin_insert`,
+`admin_update`, `admin_delete`). Reference-data changes and ban or unban are logged only when
+`auth.uid()` is not null, so seed, migrations and service-role writes create no log rows.
