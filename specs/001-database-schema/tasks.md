@@ -124,7 +124,7 @@ description: "Task list for the database schema feature"
 
 ## Phase 7: Polish
 
-- [ ] T021 SEC Follow `specs/001-database-schema/quickstart.md` end to end on a fresh `supabase db reset`: all tests pass, `supabase db lint` clean, `supabase db advisors --local --type security --level info --fail-on info` exits 0 (SC-006). Fix findings in the matching file under `supabase/migrations/` and note any accepted advisor item with its reason in `specs/001-database-schema/research.md`
+- [X] T021 SEC Follow `specs/001-database-schema/quickstart.md` end to end on a fresh `supabase db reset`: all tests pass, `supabase db lint` clean, `supabase db advisors --local --type security --level info --fail-on info` exits 0 (SC-006). Fix findings in the matching file under `supabase/migrations/` and note any accepted advisor item with its reason in `specs/001-database-schema/research.md`
 
 ---
 
