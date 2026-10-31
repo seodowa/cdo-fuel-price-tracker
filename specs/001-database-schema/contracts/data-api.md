@@ -34,7 +34,7 @@ Any column outside "Allowed columns" fails with 42501. `submitted_by`, `status` 
 
 | SQLSTATE | Meaning |
 |---|---|
-| 42501 | role, RLS or column grant refused the action (anonymous submit, non-admin approve, shift by user) |
+| 42501 | role, RLS or column grant refused the action (anonymous submit, shift by user) |
 | 23514 | range or shape check failed (price, shift, coordinates, text bounds, kind fields) |
 | 23502 | required field missing (for example shift source fields) |
 | 23505 | duplicate (station, price report per date, shift per brand/category/date, names) |
