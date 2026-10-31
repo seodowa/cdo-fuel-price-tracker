@@ -101,8 +101,8 @@ description: "Task list for the database schema feature"
 
 **Note**: `price_shift` and its checks are built in T005 because US1 needs them. FR-012, FR-013 and the deny part of FR-025 are tested first in T003. This phase adds end-to-end checks of the acceptance scenarios. It has no build task. If a check fails, fix `supabase/migrations/20261029000001_schema.sql` (not yet released) and record why.
 
-- [ ] T016 [US3] SEC Write pgTAP tests in `supabase/tests/07_shifts.test.sql` for FR-025 and US3 scenarios 1 to 5: as `service_role`, a +1.20 shift with `source_ref`, `fetched_at`, `extractor` is stored and moves every product of that brand and category in `current_price`; +120.00 raises 23514 and `current_price` is unchanged; missing source fields raise 23502; a duplicate brand, category and date raises 23505; as `authenticated` user and as admin, insert raises 42501
-- [ ] T017 [US3] Run `supabase test db`; `supabase/tests/07_shifts.test.sql` passes, earlier files still pass
+- [x] T016 [US3] SEC Write pgTAP tests in `supabase/tests/07_shifts.test.sql` for FR-025 and US3 scenarios 1 to 5: as `service_role`, a +1.20 shift with `source_ref`, `fetched_at`, `extractor` is stored and moves every product of that brand and category in `current_price`; +120.00 raises 23514 and `current_price` is unchanged; missing source fields raise 23502; a duplicate brand, category and date raises 23505; as `authenticated` user and as admin, insert raises 42501
+- [x] T017 [US3] Run `supabase test db`; `supabase/tests/07_shifts.test.sql` passes, earlier files still pass
 
 ---
 
@@ -112,13 +112,13 @@ description: "Task list for the database schema feature"
 
 **Independent Test**: invented admin and users add reference data, ban and unban, then read `admin_log`.
 
-- [ ] T018 [US4] SEC Write failing pgTAP tests in `supabase/tests/08_moderation.test.sql`:
+- [x] T018 [US4] SEC Write failing pgTAP tests in `supabase/tests/08_moderation.test.sql`:
   - FR-024: admin inserts, updates and deletes rows in `province`, `city`, `barangay`, `brand`, `fuel_category`, `fuel_product`; regular user gets 42501 or zero affected rows for each (scenario 3)
   - FR-026: admin sets `banned_at`, the user's next submission is refused (scenario 1); admin clears it, the user submits again (scenario 2); regular user cannot update any `profile`, admin cannot update `is_admin` (42501)
   - FR-027: ban, unban, and each reference-data create, update and delete write one `admin_log` row with `admin_id`, `action`, `target_table`, `target_id`, `created_at`; changes made as `postgres` (no `auth.uid()`) write none; regular user and `anon` cannot read `admin_log`; admin can; nobody can update or delete `admin_log` through `authenticated`
   - FR-004 scenario 5: admin deleting a brand with stations raises 23503
-- [ ] T019 [US4] SEC Build `supabase/migrations/20261029000004_moderation.sql`: `grant insert, update, delete` on the six reference tables to `authenticated` with admin-only policies using `(select private.is_admin())`; `grant update (banned_at) on profile to authenticated` with an admin-only update policy; `grant select on admin_log to authenticated` with an admin-only select policy; SECURITY DEFINER logging triggers in `private` with `set search_path = ''` (reference data `create`/`update`/`delete` only when `auth.uid()` is not null; `ban`/`unban` on `banned_at` change); `revoke execute on all functions in schema private from public` after creating them (re-grant only `private.is_admin()` to `authenticated`). Adds no foreign keys: delete rules stay as set in T005 and T014 (R19, D22). Makes T018 pass
-- [ ] T020 [US4] Run `supabase test db`; `supabase/tests/08_moderation.test.sql` passes, earlier files still pass
+- [x] T019 [US4] SEC Build `supabase/migrations/20261029000004_moderation.sql`: `grant insert, update, delete` on the six reference tables to `authenticated` with admin-only policies using `(select private.is_admin())`; `grant update (banned_at) on profile to authenticated` with an admin-only update policy; `grant select on admin_log to authenticated` with an admin-only select policy; SECURITY DEFINER logging triggers in `private` with `set search_path = ''` (reference data `create`/`update`/`delete` only when `auth.uid()` is not null; `ban`/`unban` on `banned_at` change); `revoke execute on all functions in schema private from public` after creating them (re-grant only `private.is_admin()` to `authenticated`). Adds no foreign keys: delete rules stay as set in T005 and T014 (R19, D22). Makes T018 pass
+- [x] T020 [US4] Run `supabase test db`; `supabase/tests/08_moderation.test.sql` passes, earlier files still pass
 
 ---
 
