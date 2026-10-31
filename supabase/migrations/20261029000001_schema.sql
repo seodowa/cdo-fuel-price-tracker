@@ -136,7 +136,7 @@ stable
 security definer
 set search_path = ''
 as $$
-  select coalesce((select is_admin from public.profile where id = auth.uid()), false)
+  select coalesce((select is_admin and banned_at is null from public.profile where id = auth.uid()), false)
 $$;
 
 create function private.handle_new_user()

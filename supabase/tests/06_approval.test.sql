@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(37);
+select plan(44);
 
 create function pg_temp.d(n int) returns date language sql as $$
   select (now() at time zone 'Asia/Manila')::date + n
@@ -209,6 +209,26 @@ select is(pg_temp.rows(format($q$ select price, submitted_by from public.price_r
 select pg_temp.login('69');
 select lives_ok($q$ select pg_temp.admin_stations(21) $q$, 'FR-017b: admin makes 21 more submissions without daily_limit');
 reset role;
+
+insert into auth.users (id, email) values ('00000000-0000-4000-8000-000000000068', 'test-appr-banned@example.test');
+update public.profile set is_admin = true, banned_at = now() where id = '00000000-0000-4000-8000-000000000068';
+select pg_temp.login('61');
+select lives_ok(pg_temp.q_price(67.77, -9), 'FR-024: user submits a price for a banned admin to decide');
+select lives_ok(pg_temp.q_price(68.88, -10), 'FR-017a: user submits a price for an admin to withdraw');
+select pg_temp.login('68');
+select is(pg_temp.rows($q$ select count(*) from public.submission
+  where submitted_by = '00000000-0000-4000-8000-000000000061' $q$),
+  '(0)', 'FR-024: banned admin cannot read another user''s submissions');
+select lives_ok($q$ update public.submission set status = 'approved' where price = 67.77 $q$,
+  'FR-024: banned admin approve attempt');
+select lives_ok($q$ update public.submission set status = 'rejected' where price = 67.77 $q$,
+  'FR-024: banned admin reject attempt');
+select pg_temp.login('69');
+select throws_ok($q$ update public.submission set status = 'withdrawn' where price = 68.88 $q$,
+  'P0001', 'not_allowed', 'FR-017a: admin cannot withdraw another user''s submission');
+reset role;
+select is(pg_temp.rows($q$ select status, decided_by, decided_at from public.submission where price in (67.77, 68.88) order by id $q$),
+  '(pending,,);(pending,,)', 'FR-024: banned admin decisions and admin withdrawal leave the submission pending');
 
 select * from finish();
 rollback;

@@ -29,6 +29,7 @@ exist (research R1). Field types and checks are in `data-model.md`.
 
 Any column outside "Allowed columns" fails with 42501. `submitted_by`, `status` on insert,
 `decided_by` and `decided_at` are set by the database.
+A submitter can read `decided_by` on their own submissions (accepted).
 
 ## Errors
 

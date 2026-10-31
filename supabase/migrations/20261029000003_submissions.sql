@@ -1,6 +1,6 @@
 create table public.submission (
   id bigint generated always as identity primary key,
-  submitted_by uuid not null default auth.uid() references public.profile on delete cascade,
+  submitted_by uuid not null references public.profile on delete cascade,
   kind text not null check (kind in ('station', 'price', 'correction')),
   status text not null default 'pending' check (status in ('pending', 'approved', 'rejected', 'withdrawn')),
   created_at timestamptz not null default now(),

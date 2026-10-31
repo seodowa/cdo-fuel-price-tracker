@@ -23,6 +23,7 @@ Open decisions were answered as D17 to D21 in `decisions.md`.
 - Decision: `profile.is_admin boolean not null default false`. Only the service role (SQL editor or
   server process) sets it. No grant on that column to `anon` or `authenticated`. No in-app "make
   admin" action, since no FR asks for one.
+- A banned admin has no admin rights: `private.is_admin()` requires `banned_at is null`.
 - Rationale: matches the spec assumption ("set only by an existing admin or the server process")
   with the smaller of the two paths. Answers checklist CHK002.
 - Alternatives: JWT custom claim through an auth hook. More moving parts and a stale claim until

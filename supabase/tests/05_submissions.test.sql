@@ -149,7 +149,7 @@ select throws_ok($q$ update public.submission set price = 65.00 where price = 61
   'FR-017a: submitter cannot update a column other than status');
 select pg_temp.try($q$ update public.submission set status = 'pending' where price = 63.33 $q$);
 select is(pg_temp.rows($q$ select status from public.submission where price = 63.33 $q$), '(withdrawn)',
-  'FR-017a: submitter cannot change a withdrawn submission');
+  'FR-017a: RLS hides the submitter''s non-pending row from update');
 select throws_ok($q$ delete from public.submission where submitted_by = auth.uid() $q$, '42501', null,
   'SC-003: submitter cannot delete own submission');
 select is(pg_temp.rows($q$ select id from public.profile $q$), '(00000000-0000-4000-8000-000000000051)',
