@@ -40,14 +40,14 @@ Postgres image, enabled in tests).
 
 ## Constitution Check
 
-| Principle | Status | How |
-|---|---|---|
-| I. Prices derived | Pass | `current_price` computed on read (R5). Baselines, overrides and shifts are separate rows. Corrections update in place (R10). `reported_at` and `shifted_at` give price age. |
-| II. External data untrusted | Pass | Shift schema, ranges and non-null source fields (`source_ref`, `fetched_at`, `extractor`) are constraints. Failed inserts change nothing. Fetcher and failed-shift review are out of scope (spec Assumptions, `OPEN-QUESTIONS.md`). |
-| III. Server enforces rules | Pass | RLS on every table, deny by default (FR-021). Ranges in domains. Rate limit in a trigger. Admin actions restricted and logged. |
-| IV. Test first | Pass with justified deviations (D24) | Every FR has a pgTAP test task before its build task (tasks.md). Two deviations, listed in Complexity Tracking. |
-| V. Simplest thing | Pass | No RPC layer, no history table, no custom claim. Supabase CLI approved by the user (D17). |
-| Security constraints | Pass | No secrets in this feature. Service-role key unused by the code here. Test fixtures invented. |
+| Principle                   | Status                               | How                                                                                                                                                                                                                                 |
+| --------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| I. Prices derived           | Pass                                 | `current_price` computed on read (R5). Baselines, overrides and shifts are separate rows. Corrections update in place (R10). `reported_at` and `shifted_at` give price age.                                                         |
+| II. External data untrusted | Pass                                 | Shift schema, ranges and non-null source fields (`source_ref`, `fetched_at`, `extractor`) are constraints. Failed inserts change nothing. Fetcher and failed-shift review are out of scope (spec Assumptions, `OPEN-QUESTIONS.md`). |
+| III. Server enforces rules  | Pass                                 | RLS on every table, deny by default (FR-021). Ranges in domains. Rate limit in a trigger. Admin actions restricted and logged.                                                                                                      |
+| IV. Test first              | Pass with justified deviations (D24) | Every FR has a pgTAP test task before its build task (tasks.md). Two deviations, listed in Complexity Tracking.                                                                                                                     |
+| V. Simplest thing           | Pass                                 | No RPC layer, no history table, no custom claim. Supabase CLI approved by the user (D17).                                                                                                                                           |
+| Security constraints        | Pass                                 | No secrets in this feature. Service-role key unused by the code here. Test fixtures invented.                                                                                                                                       |
 
 Re-check after Phase 1 design: no new violations. Complexity Tracking is empty.
 
@@ -124,21 +124,21 @@ story installs and tests on its own.
 
 Deviations from constitution IV, acknowledged by the user (D24):
 
-| Violation | Why Needed | Simpler Alternative Rejected Because |
-|-----------|------------|-------------------------------------|
-| T016 (`07_shifts.test.sql`) is not required to fail first | `price_shift` is built in T005 because US1 needs it, and its FR-012, FR-013 and FR-025 tests fail first in T003. T016 only re-checks the US3 scenarios end to end | Moving `price_shift` into US3 would block US1, the MVP |
-| Playwright smoke tests (view prices, submit baseline, submit override) are deferred | This feature has no screens (D2), so there is no flow to drive | Writing them now would test UI that does not exist. The screen features must add them |
+| Violation                                                                           | Why Needed                                                                                                                                                        | Simpler Alternative Rejected Because                                                  |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| T016 (`07_shifts.test.sql`) is not required to fail first                           | `price_shift` is built in T005 because US1 needs it, and its FR-012, FR-013 and FR-025 tests fail first in T003. T016 only re-checks the US3 scenarios end to end | Moving `price_shift` into US3 would block US1, the MVP                                |
+| Playwright smoke tests (view prices, submit baseline, submit override) are deferred | This feature has no screens (D2), so there is no flow to drive                                                                                                    | Writing them now would test UI that does not exist. The screen features must add them |
 
 ## Validate
 
 Date: 2026-10-29. Verdict: CONDITIONAL
 
-| Check | Verdict | Findings |
-|-------|---------|----------|
-| 1. Setup and dependencies | CONCERN | F5 |
+| Check                            | Verdict | Findings   |
+| -------------------------------- | ------- | ---------- |
+| 1. Setup and dependencies        | CONCERN | F5         |
 | 2. Test coverage per requirement | CONCERN | F1, F3, F8 |
-| 3. Breaking changes | CONCERN | F6 |
-| 4. Security and privacy | CONCERN | F4, F14 |
+| 3. Breaking changes              | CONCERN | F6         |
+| 4. Security and privacy          | CONCERN | F4, F14    |
 
 F1. tasks.md:102, contracts/data-api.md:38, research.md:66 `shift_php` is `numeric(4,2)`, so +120.00 fails with 22003 (numeric field overflow) before the range check, not 23514. Verified on local Postgres 18. -> Make the domain `numeric(5,2)` so out-of-range shifts reach the check and return 23514 as the contract says.
 F3. tasks.md:41 SC-003 needs every forbidden action tested. Tests cover inserts only. Missing: update and delete on `price_report`, `station`, `station_product`, `price_shift` as `authenticated` and admin. Select on `submission` and `profile` as `anon`. Delete on `submission` as its submitter. -> Add these cases to T003, T012 and T018.

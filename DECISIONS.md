@@ -3,6 +3,7 @@
 Newest first. Each entry is the date, the decision made and the reason for it.
 
 ## 2026-10-28
+
 - Weekly price shifts are recorded per brand and fuel category. Each shift applies to every product in that category at every branch of that brand.
   Reason: fuel prices are deregulated, so brands can announce different amounts or effective times. One row per brand keeps a brand that differs correct without branch overrides.
 - Stations have no price columns. Fuel categories, each brand's fuel products and the products each station sells are separate tables, and baselines, shifts and overrides are rows. The current price is computed.
@@ -17,6 +18,7 @@ Newest first. Each entry is the date, the decision made and the reason for it.
   Reason: floating-point types round money values incorrectly.
 
 ## 2026-10-26
+
 - The app is a web app built with SvelteKit and Supabase.
   Reason: a web app reaches users without an app install, and Supabase provides the database, sign-in and access rules without a custom backend.
 - Fuel prices are crowdsourced. Anyone can view prices, and only signed-in users can submit them.

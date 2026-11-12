@@ -26,10 +26,10 @@ supabase db advisors --local --type security --level info --fail-on info   # SC-
 
 ## Expected results
 
-| Step | Expected |
-|---|---|
-| `supabase db reset` | finishes with no error (SC-005) |
-| `supabase test db` | every file `ok`, no failures |
+| Step                   | Expected                           |
+| ---------------------- | ---------------------------------- |
+| `supabase db reset`    | finishes with no error (SC-005)    |
+| `supabase test db`     | every file `ok`, no failures       |
 | `supabase db advisors` | exits 0, no issues listed (SC-006) |
 
 ## Spot checks (psql against the local database)

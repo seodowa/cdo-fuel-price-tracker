@@ -8,7 +8,7 @@
 
 **Input**: User description: "UI from design_handoff_fuel_price_dashboard/, first part: the public Dashboard with the shared layout, theme and responsive shell." Grilling decisions D1 to D14 are in `decisions.md`.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 This feature is the first of three UI specs (D1): 002 public views, 003 sign-in and Contribute,
 004 admin. Analytics comes later in its own spec (D2). It reads the data layer from
@@ -126,7 +126,7 @@ and to light, use the toggle, reload, and visit each tab.
   toggle still works for the open page.
 - The app name wraps or shrinks on narrow phones and never pushes the menu button off screen.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -199,7 +199,7 @@ This feature reads the 001 entities and adds none.
 - **Shift** (from 001): a brand's weekly amount for a fuel category, with its effective date.
 - **Mode preference**: the visitor's dark or light choice, kept only in their own browser.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

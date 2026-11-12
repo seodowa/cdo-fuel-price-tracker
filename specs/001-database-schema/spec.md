@@ -8,7 +8,7 @@
 
 **Input**: User description: "Database schema for the fuel price tracker, following the 2026-10-28 entries in DECISIONS.md (locations, brands, fuel categories and products, station products, baselines, shifts per brand and category, overrides, computed current price)." Grilling decisions D1 to D25 are in `decisions.md`.
 
-## User Scenarios & Testing *(mandatory)*
+## User Scenarios & Testing _(mandatory)_
 
 This feature delivers the data layer only (D2). Screens come in later features. Each story is tested
 directly against the data layer.
@@ -146,7 +146,7 @@ and check the log and the ban effect.
 - Coordinates outside the Philippines are refused. Missing coordinates are allowed.
 - Rejected, pending and withdrawn submissions count toward the 20-per-day limit.
 
-## Requirements *(mandatory)*
+## Requirements _(mandatory)_
 
 ### Functional Requirements
 
@@ -241,7 +241,7 @@ and check the log and the ban effect.
 - **Profile**: a user's account data in the app, holding the admin flag and the ban time.
 - **Admin log**: one entry per admin action.
 
-## Success Criteria *(mandatory)*
+## Success Criteria _(mandatory)_
 
 ### Measurable Outcomes
 

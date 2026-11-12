@@ -20,8 +20,8 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
      PostgREST embeds them)
   3. `from('fuel_product').select('id, name, category_id')`
   4. `from('fuel_category').select('id, name').order('name')`
-  Wave 2, one per category, in parallel:
-  `from('price_shift').select('brand_id, amount, effective_on').eq('category_id', id).lte('effective_on', today).order('effective_on', { ascending: false }).limit(1000)`
+     Wave 2, one per category, in parallel:
+     `from('price_shift').select('brand_id, amount, effective_on').eq('category_id', id).lte('effective_on', today).order('effective_on', { ascending: false }).limit(1000)`
 - Any response with `error`, or with exactly 1000 rows (`max_rows`, `supabase/config.toml:18`),
   is a load failure, so a truncated list never produces a wrong ranking.
   `ponytail: 1000-row ceiling per request, add .range() paging when a city passes ~250 stations x 4 products`.
@@ -69,7 +69,7 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
   3. sort by price ascending, then `reportedAt` descending, then brand, then location
      (`localeCompare(…, 'en')`),
   4. number ranks from 1.
-  "Cheapest in CDO" is `rankStations(rows, c)[0]` for each category, so both use the same order.
+     "Cheapest in CDO" is `rankStations(rows, c)[0]` for each category, so both use the same order.
 - Bars: `Math.round(price / highest * 100)` percent of the highest ranked price (all pages). The
   first-ranked row uses `--accent`, the rest `--mid` (mock).
 - A fuel with no ranked station shows "No prices reported yet" in the ranking and in that fuel's
@@ -160,7 +160,7 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
 ## R10. Imports and links in SvelteKit 3
 
 - `$lib` is removed in Kit 3. Use `#lib` (Node subpath import in `package.json`, `"#lib/*":
-  "./src/lib/*"`). The mapping adds no extension, and the generated tsconfig sets
+"./src/lib/*"`). The mapping adds no extension, and the generated tsconfig sets
   `allowImportingTsExtensions`, so import `#lib/dashboard.ts` with the extension. Confirm with
   `npm run check` in the first task that uses it.
 - `eslint-plugin-svelte` recommended config enables `svelte/no-navigation-without-resolve`. Build
@@ -207,18 +207,19 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
 
 - Contrast, computed from the handoff OKLCH tokens (WCAG 2 formula):
 
-  | Pair | Dark | Light |
-  |---|---|---|
-  | ink on card | 14.40 | 13.43 |
-  | muted on card ("est.", legend, location) | 7.05 | 7.73 |
-  | muted on bg | 8.04 | 6.83 |
-  | accent on card (cheapest prices) | 9.30 | 5.44 |
-  | on-accent on accent (selected fuel) | 10.37 | 6.05 |
-  | up on card / up on up-bg | 6.34 / 5.14 | 6.35 / 4.89 |
-  | down on card / down on down-bg | 9.12 / 6.98 | 6.74 / 5.39 |
-  | muted on soft (neutral adjustment box) | 5.63 | 6.14 |
+  | Pair                                     | Dark        | Light       |
+  | ---------------------------------------- | ----------- | ----------- |
+  | ink on card                              | 14.40       | 13.43       |
+  | muted on card ("est.", legend, location) | 7.05        | 7.73        |
+  | muted on bg                              | 8.04        | 6.83        |
+  | accent on card (cheapest prices)         | 9.30        | 5.44        |
+  | on-accent on accent (selected fuel)      | 10.37       | 6.05        |
+  | up on card / up on up-bg                 | 6.34 / 5.14 | 6.35 / 4.89 |
+  | down on card / down on down-bg           | 9.12 / 6.98 | 6.74 / 5.39 |
+  | muted on soft (neutral adjustment box)   | 5.63        | 6.14        |
 
   All pass 4.5:1. Disabled Prev / Next at 35% opacity are inactive controls and exempt.
+
 - Bars (CHK015): `aria-hidden="true"`. The row's price text and the footer line "City avg ₱… · bars
   scaled to highest price" carry the same information (WCAG 1.1.1 decoration case).
 - ▲ ▼ glyphs: `aria-hidden="true"`, the word "Increase" or "Rollback" and the signed amount are the
@@ -247,8 +248,8 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
   (`postgresql://postgres:postgres@127.0.0.1:54322/postgres`) from the e2e file through
   `execSync('psql … -v ON_ERROR_STOP=1 -f …')`:
   - `supabase/fixtures/empty.sql`: `truncate public.price_shift, public.price_report,
-    public.station_product, public.station, public.fuel_product, public.brand restart identity
-    cascade;` (cascade also clears `submission` and `admin_log` rows that point at them).
+public.station_product, public.station, public.fuel_product, public.brand restart identity
+cascade;` (cascade also clears `submission` and `admin_log` rows that point at them).
   - `supabase/fixtures/dashboard.sql`: invented brands, 12 gasoline stations, diesel at some,
     kerosene at none, a two-product gasoline station (62.45 and 68.10), one report dated today, one
     dated 12 days ago with a later shift. Dates relative to `(now() at time zone 'Asia/Manila')::date`.

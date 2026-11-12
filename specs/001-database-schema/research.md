@@ -98,7 +98,7 @@ Open decisions were answered as D17 to D25 in `decisions.md`.
 ## R9. Rate limit concurrency
 
 - Decision: the BEFORE INSERT trigger runs `select ... from profile where id = auth.uid() for
-  update` before counting, so two parallel inserts by one account cannot both pass the count of 19.
+update` before counting, so two parallel inserts by one account cannot both pass the count of 19.
 - Index: `submission (submitted_by, created_at)`.
 
 ## R10. Correction contents
@@ -177,8 +177,8 @@ Open decisions were answered as D17 to D25 in `decisions.md`.
 ## R19. Account deletion (D22, FR-028)
 
 - Decision: deleting an `auth.users` row cascades to `profile` (`profile.id → auth.users on delete
-  cascade`) and to that person's `submission` rows (`submission.submitted_by → profile on delete
-  cascade`). These references become nullable and `on delete set null`:
+cascade`) and to that person's `submission` rows (`submission.submitted_by → profile on delete
+cascade`). These references become nullable and `on delete set null`:
   `price_report.submitted_by`, `admin_log.admin_id`, `submission.decided_by`. Every other foreign
   key stays `on delete restrict`.
 - Index `price_report_submitted_by_idx` on `price_report (submitted_by)` keeps the set-null step

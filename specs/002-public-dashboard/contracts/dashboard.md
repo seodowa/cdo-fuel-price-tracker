@@ -2,25 +2,25 @@
 
 ## Routes
 
-| Path | Data | Content |
-|---|---|---|
-| `/` | `+page.server.ts` load (data-model "Page data") | Dashboard. Query: `fuel`, `page` |
-| `/analytics` | none | `<h1>Analytics</h1>`, "Coming soon" |
-| `/contribute` | none | `<h1>Contribute</h1>`, "Coming soon" |
-| any load failure on `/` | status 503 | "Prices couldn't load. Try again later." and a "Try again" link |
+| Path                    | Data                                            | Content                                                         |
+| ----------------------- | ----------------------------------------------- | --------------------------------------------------------------- |
+| `/`                     | `+page.server.ts` load (data-model "Page data") | Dashboard. Query: `fuel`, `page`                                |
+| `/analytics`            | none                                            | `<h1>Analytics</h1>`, "Coming soon"                             |
+| `/contribute`           | none                                            | `<h1>Contribute</h1>`, "Coming soon"                            |
+| any load failure on `/` | status 503                                      | "Prices couldn't load. Try again later." and a "Try again" link |
 
 No route takes input other than the `fuel` and `page` query parameters. Both are matched against
 known values (data-model "URL state") and never echoed raw.
 
 ## Data reads (001 `contracts/data-api.md`, anon role)
 
-| Object | Columns |
-|---|---|
-| `current_price` | `station_id, product_id, price, reported_at, is_estimate` |
-| `station` | `id, street_address`, embedded `brand(name)`, `barangay(name)` |
-| `fuel_product` | `id, name, category_id` |
-| `fuel_category` | `id, name` |
-| `price_shift` | `brand_id, amount, effective_on`, filtered `category_id=eq.{id}`, `effective_on=lte.{today}` |
+| Object          | Columns                                                                                      |
+| --------------- | -------------------------------------------------------------------------------------------- |
+| `current_price` | `station_id, product_id, price, reported_at, is_estimate`                                    |
+| `station`       | `id, street_address`, embedded `brand(name)`, `barangay(name)`                               |
+| `fuel_product`  | `id, name, category_id`                                                                      |
+| `fuel_category` | `id, name`                                                                                   |
+| `price_shift`   | `brand_id, amount, effective_on`, filtered `category_id=eq.{id}`, `effective_on=lte.{today}` |
 
 Never selected: `price_report` (any column), `submission`, `profile`, `admin_log`.
 
@@ -43,19 +43,19 @@ cases in `src/lib/dashboard.spec.ts`, written before it.
 
 ## Displayed text (fixed strings)
 
-| Place | Text |
-|---|---|
-| App name | CDO Fuel Price Tracker |
-| Tabs | Dashboard, Analytics, Contribute |
-| Mode button label | Switch to light mode / Switch to dark mode |
-| Menu button label | Menu |
-| Ranking title | Station ranking |
-| Ranking row | brand, then `{street}, {barangay} · {age}` plus ` · est.` when estimated, product name beside the price |
-| Legend | est. = reported price plus weekly adjustments since then |
-| Footer | City avg ₱{avg} · bars scaled to highest price |
-| Pagination | ‹ Prev, Page N of M, Next › |
-| Adjustment card | PRICE ADJUSTMENT, As of {Mon D, YYYY}, Change per litre vs. previous week |
-| Cheapest card | CHEAPEST IN CDO. Per fuel: fuel name, `{brand} · {barangay} · {age}` plus ` · est.`, product name beside the price |
-| Empty | No prices reported yet |
-| Error | Prices couldn't load. Try again later. |
-| Coming soon pages | Coming soon |
+| Place             | Text                                                                                                               |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------ |
+| App name          | CDO Fuel Price Tracker                                                                                             |
+| Tabs              | Dashboard, Analytics, Contribute                                                                                   |
+| Mode button label | Switch to light mode / Switch to dark mode                                                                         |
+| Menu button label | Menu                                                                                                               |
+| Ranking title     | Station ranking                                                                                                    |
+| Ranking row       | brand, then `{street}, {barangay} · {age}` plus ` · est.` when estimated, product name beside the price            |
+| Legend            | est. = reported price plus weekly adjustments since then                                                           |
+| Footer            | City avg ₱{avg} · bars scaled to highest price                                                                     |
+| Pagination        | ‹ Prev, Page N of M, Next ›                                                                                        |
+| Adjustment card   | PRICE ADJUSTMENT, As of {Mon D, YYYY}, Change per litre vs. previous week                                          |
+| Cheapest card     | CHEAPEST IN CDO. Per fuel: fuel name, `{brand} · {barangay} · {age}` plus ` · est.`, product name beside the price |
+| Empty             | No prices reported yet                                                                                             |
+| Error             | Prices couldn't load. Try again later.                                                                             |
+| Coming soon pages | Coming soon                                                                                                        |

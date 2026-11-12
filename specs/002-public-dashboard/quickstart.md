@@ -28,11 +28,11 @@ The e2e run truncates price tables in the local database (`supabase/fixtures/emp
 
 ## Expected
 
-| Step | Expected |
-|---|---|
-| check, lint | no errors |
-| Vitest | every case in both spec files passes |
-| Playwright | empty state, ranking, pagination, fuel switch, prices without JS, first-visit mode follows the device, saved mode kept after reload with app JS blocked, mobile menu, Coming soon pages, no third-party requests: all pass |
+| Step        | Expected                                                                                                                                                                                                                   |
+| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| check, lint | no errors                                                                                                                                                                                                                  |
+| Vitest      | every case in both spec files passes                                                                                                                                                                                       |
+| Playwright  | empty state, ranking, pagination, fuel switch, prices without JS, first-visit mode follows the device, saved mode kept after reload with app JS blocked, mobile menu, Coming soon pages, no third-party requests: all pass |
 
 ## By hand
 

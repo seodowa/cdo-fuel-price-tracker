@@ -51,14 +51,14 @@ error page.
 
 ## Constitution Check
 
-| Principle | Status | How |
-|---|---|---|
-| I. Prices derived | Pass | Prices come only from the `current_price` view. Ranking rows and "Cheapest in CDO" rows show report age and "est." (FR-004, FR-008, D17) |
-| II. External data untrusted | Pass | No third-party data. Fonts self-hosted (D13). Supabase URL and key from server env |
-| III. Server enforces rules | Pass | Read only, anon role, RLS from 001. No writes, no sign-in |
-| IV. Test first | Pass | Vitest tests first for every pure function and the load failure path. Playwright smoke for "view prices" and the shell (D14). RLS unchanged, so no new pgTAP. FR-020 (visual match) is checked by eye, as D14 decided |
-| V. Simplest thing | Pass | One dependency, approved (D15). Platform first: URL state, popover, `light-dark()`, CSS icon swap, `text-transform` for fuel labels |
-| Security constraints | Pass, CSP deferred | Publishable key read on the server only. Invented fixtures. CSP deferred to a hardening spec before the first deploy (D19, `OPEN-QUESTIONS.md` 2026-11-12) |
+| Principle                   | Status             | How                                                                                                                                                                                                                   |
+| --------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| I. Prices derived           | Pass               | Prices come only from the `current_price` view. Ranking rows and "Cheapest in CDO" rows show report age and "est." (FR-004, FR-008, D17)                                                                              |
+| II. External data untrusted | Pass               | No third-party data. Fonts self-hosted (D13). Supabase URL and key from server env                                                                                                                                    |
+| III. Server enforces rules  | Pass               | Read only, anon role, RLS from 001. No writes, no sign-in                                                                                                                                                             |
+| IV. Test first              | Pass               | Vitest tests first for every pure function and the load failure path. Playwright smoke for "view prices" and the shell (D14). RLS unchanged, so no new pgTAP. FR-020 (visual match) is checked by eye, as D14 decided |
+| V. Simplest thing           | Pass               | One dependency, approved (D15). Platform first: URL state, popover, `light-dark()`, CSS icon swap, `text-transform` for fuel labels                                                                                   |
+| Security constraints        | Pass, CSP deferred | Publishable key read on the server only. Invented fixtures. CSP deferred to a hardening spec before the first deploy (D19, `OPEN-QUESTIONS.md` 2026-11-12)                                                            |
 
 Re-check after Phase 1 design: no violation. Complexity Tracking is empty.
 
@@ -84,26 +84,26 @@ Tasks tagged **SEC** in `tasks.md` need review against `SECURITY.md`:
 
 ## Checklist answers (`checklists/ux.md`)
 
-| Item | Answer |
-|---|---|
-| CHK001 | Breakpoint 768px for header and row layout. Cards stack through the mock grid (R12) |
-| CHK002 | `<h1>` with the tab name and "Coming soon". Header tabs are the way back (R15) |
-| CHK003 | Ranking: "street address, barangay". Cheapest: "Brand · Barangay" (D16, R5) |
-| CHK004 | `<title>` per page (R15) |
-| CHK005 | Average in integer centavos, rounded half up (R4) |
-| CHK006 | Fixed `en-US` short month, "Oct 27, 2026", in every locale (R6) |
-| CHK007 | Playwright blocks the app JS, reloads, checks `html[data-theme]` and the body colour (R8) |
-| CHK008 | One comparator serves the ranking and "Cheapest in CDO" (R5) |
-| CHK009 | Shift summary returns `no-change`, Vitest case (R6) |
-| CHK010 | Native popover: open, Escape, outside click, close on tab choice, focus return (R12) |
-| CHK011 | Ages use the Manila date at load time. A page left open past midnight keeps its labels until reload (R7) |
-| CHK012 | Text wraps (`overflow-wrap: anywhere`, `min-width: 0`) (R14) |
+| Item   | Answer                                                                                                          |
+| ------ | --------------------------------------------------------------------------------------------------------------- |
+| CHK001 | Breakpoint 768px for header and row layout. Cards stack through the mock grid (R12)                             |
+| CHK002 | `<h1>` with the tab name and "Coming soon". Header tabs are the way back (R15)                                  |
+| CHK003 | Ranking: "street address, barangay". Cheapest: "Brand · Barangay" (D16, R5)                                     |
+| CHK004 | `<title>` per page (R15)                                                                                        |
+| CHK005 | Average in integer centavos, rounded half up (R4)                                                               |
+| CHK006 | Fixed `en-US` short month, "Oct 27, 2026", in every locale (R6)                                                 |
+| CHK007 | Playwright blocks the app JS, reloads, checks `html[data-theme]` and the body colour (R8)                       |
+| CHK008 | One comparator serves the ranking and "Cheapest in CDO" (R5)                                                    |
+| CHK009 | Shift summary returns `no-change`, Vitest case (R6)                                                             |
+| CHK010 | Native popover: open, Escape, outside click, close on tab choice, focus return (R12)                            |
+| CHK011 | Ages use the Manila date at load time. A page left open past midnight keeps its labels until reload (R7)        |
+| CHK012 | Text wraps (`overflow-wrap: anywhere`, `min-width: 0`) (R14)                                                    |
 | CHK013 | Fuel and page are links and work without JS. Mode follows the device without JS (D18). The toggle needs JS (R8) |
-| CHK014 | Error page shows the FR-014 message and a "Try again" link. Header stays (R15) |
-| CHK015 | Bars `aria-hidden`. Price text and "bars scaled to highest price" carry the same information (R14) |
-| CHK016 | Fuel link `aria-current="true"`, active tab `aria-current="page"` (R14) |
-| CHK017 | `prefers-reduced-motion: reduce` turns off transitions (R14) |
-| CHK018 | Every text token pair computed at 4.89:1 or higher in both modes (R14) |
+| CHK014 | Error page shows the FR-014 message and a "Try again" link. Header stays (R15)                                  |
+| CHK015 | Bars `aria-hidden`. Price text and "bars scaled to highest price" carry the same information (R14)              |
+| CHK016 | Fuel link `aria-current="true"`, active tab `aria-current="page"` (R14)                                         |
+| CHK017 | `prefers-reduced-motion: reduce` turns off transitions (R14)                                                    |
+| CHK018 | Every text token pair computed at 4.89:1 or higher in both modes (R14)                                          |
 
 ## Project Structure
 
