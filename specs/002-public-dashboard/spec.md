@@ -42,7 +42,8 @@ values.
 6. **Given** a price reported 12 days ago with a later shift applied, **When** it is shown,
    **Then** its row reads "12 days ago · est.", and a legend under the ranking explains "est.".
 7. **Given** invented prices, **When** the Dashboard loads, **Then** "Cheapest in CDO" shows, for
-   each of diesel, gasoline and kerosene, the lowest price with its station and product.
+   each of diesel, gasoline and kerosene, the lowest price with its station, product, report age
+   and, when a shift applied, "est." (for example "Petron · Lapasan · 2 days ago · est.").
 8. **Given** the selected fuel, **When** the ranking is shown, **Then** a line under it shows the
    city average of the ranked prices, and each row's bar is scaled to the highest ranked price.
 9. **Given** no approved prices exist, **When** a visitor opens the Dashboard, **Then** the ranking
@@ -145,8 +146,8 @@ and to light, use the toggle, reload, and visit each tab.
   of M" label (D11).
 - **FR-007**: The ranking MUST show the city average of the ranked prices for the selected fuel and
   a bar per row scaled to the highest ranked price.
-- **FR-008**: "Cheapest in CDO" MUST show, for each fuel, the lowest price with its station and
-  product (D3).
+- **FR-008**: "Cheapest in CDO" MUST show, for each fuel, the lowest price with its brand,
+  barangay, product, report age and, when a shift applied, the "est." label (D3, D16, D17).
 
 **Price adjustment**
 
