@@ -11,7 +11,8 @@ Proves SC-001 to SC-003 (Vitest), the D14 smoke flows (Playwright), SC-005 (no f
    supabase db reset
    ```
 2. `.env` in the repository root (copy `.env.example`). Values from `supabase status`:
-   `SUPABASE_URL` = API URL (`http://127.0.0.1:54321`), `SUPABASE_PUBLISHABLE_KEY` = publishable key.
+   `SUPABASE_URL` = API URL (`http://127.0.0.1:54321`), `SUPABASE_PUBLISHABLE_KEY` = publishable key,
+   `SUPABASE_DB_URL` = DB URL (host `127.0.0.1`, used only by the e2e fixtures, D21).
 3. `npm install` (includes `@supabase/supabase-js`, D15). `psql` on the PATH.
 
 ## Run
@@ -32,11 +33,11 @@ The e2e run truncates price tables in the local database (`supabase/fixtures/emp
 | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | check, lint | no errors                                                                                                                                                                                                                  |
 | Vitest      | every case in both spec files passes                                                                                                                                                                                       |
-| Playwright  | empty state, ranking, pagination, fuel switch, prices without JS, first-visit mode follows the device, saved mode kept after reload with app JS blocked, mobile menu, Coming soon pages, no third-party requests: all pass |
+| Playwright  | empty state, ranking, pagination, fuel switch, unknown fuel falls back, prices without JS, adjustment card, first-visit mode follows the device, invalid saved value ignored, saved mode kept after reload with app JS blocked, mobile menu, Coming soon pages, no third-party requests: all pass |
 
 ## By hand
 
-1. `psql postgresql://postgres:postgres@127.0.0.1:54322/postgres -f supabase/fixtures/dashboard.sql`,
+1. `psql "$SUPABASE_DB_URL" -f supabase/fixtures/dashboard.sql` (after loading `.env` into the shell),
    then `npm run dev` and open http://localhost:5173.
 2. Side by side with `design_handoff_fuel_price_dashboard/design_files/Fuel Price Dashboard.dc.html`
    and `… Mobile.dc.html`, in dark and light, at 1280px and 390px (SC-007).
@@ -44,4 +45,6 @@ The e2e run truncates price tables in the local database (`supabase/fixtures/emp
 4. Tab through the page: every control is reachable and shows a focus ring (SC-008).
 5. Turn on "reduce motion" in the OS: tab underline no longer animates.
 6. Switch the OS between dark and light with no saved choice (clear site data): the app follows it, also with JavaScript disabled.
-7. Stop Supabase (`supabase stop`) and reload: the error page shows (FR-014).
+7. Stop Supabase (`supabase stop`) and reload: the error page shows (FR-014), and "Try again" works after `supabase start`.
+8. Block site data for localhost: the app follows the device and the toggle still switches the open page.
+9. SC-004: on a phone-sized window, find the cheapest station for a chosen fuel within 10 seconds with at most one tap.

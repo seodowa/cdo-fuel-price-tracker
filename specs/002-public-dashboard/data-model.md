@@ -70,7 +70,7 @@ Rules: research R6.
 
 | Param  | Values                  | Default / invalid         |
 | ------ | ----------------------- | ------------------------- |
-| `fuel` | a name in `categories`  | `gasoline`                |
+| `fuel` | a name in `categories`, exact match (`pickFuel`) | `gasoline` |
 | `page` | integer 1 .. page count | 1, and clamped into range |
 
 Page size: 10 (D11).

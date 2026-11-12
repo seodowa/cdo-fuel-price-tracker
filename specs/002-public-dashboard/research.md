@@ -1,6 +1,6 @@
 # Research: Public Dashboard
 
-Inputs: `spec.md`, `decisions.md` (D1 to D14), `checklists/ux.md`, the design handoff README and
+Inputs: `spec.md`, `decisions.md` (D1 to D22), `checklists/ux.md`, the design handoff README and
 `.dc.html` files, the 001 migrations and contract, constitution 1.0.0, `SECURITY.md`,
 `WCAG-TEXT-ALTERNATIVES.md`. Installed versions checked in `node_modules`: `@sveltejs/kit` 3.2.0,
 `svelte` 5.57.3, `vitest` 4.1.12, `@playwright/test` 1.65.0, `vite` 8.3.8. Supabase CLI 2.122.0
@@ -40,9 +40,11 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
 - Decision: `+page.server.ts` returns all rows and the shift summary. It does not read
   `url.searchParams`, so SvelteKit does not rerun it when only the query string changes. The page
   reads `fuel` and `page` from `page.url.searchParams` (`$app/state`) and derives the ranking with
-  `$derived`. Fuel buttons and Prev / Next are `<a>` links with `data-sveltekit-noscroll`.
+  `$derived`. The query value is stored as `pageParam` so it does not shadow `page` from
+  `$app/state`. Fuel buttons and Prev / Next are `<a>` links with `data-sveltekit-noscroll`.
 - Without JS, the links are full page loads and the server renders the chosen fuel and page.
-- Invalid `fuel` falls back to `gasoline`. `page` is clamped to 1 .. page count.
+- `pickFuel(param, categories)` (pure, tested) returns `param` only when it exactly matches a
+  category name, otherwise `gasoline`. `paginate` clamps `page` to 1 .. page count.
 - Rationale: one data fetch per visit, shareable URLs, works without JS, no store.
 - Docs: SvelteKit "Loading data > Rerunning load functions", "$app/state".
 
@@ -70,7 +72,8 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
      (`localeCompare(…, 'en')`),
   4. number ranks from 1.
      "Cheapest in CDO" is `rankStations(rows, c)[0]` for each category, so both use the same order.
-- Bars: `Math.round(price / highest * 100)` percent of the highest ranked price (all pages). The
+- Bars: `barPercent(cents, highestCents)` = `Math.round(cents / highestCents * 100)`, where the
+  highest is the last ranked row (all pages). Pure and tested. The
   first-ranked row uses `--accent`, the rest `--mid` (mock).
 - A fuel with no ranked station shows "No prices reported yet" in the ranking and in that fuel's
   row of "Cheapest in CDO". With no prices at all, every place shows it (FR-013).
@@ -187,8 +190,10 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
   return and the expanded state. `afterNavigate(() => menu?.hidePopover())` closes it after a tab
   is chosen. Burger ☰ / close ✕ swap with `:has(#site-menu:popover-open)`. Works without JS.
 - All of this lives in `src/lib/components/Header.svelte` (the user's file), rendered once by
-  `src/routes/+layout.svelte`. Tabs are rendered once in a `{#snippet}` and used in both the desktop
-  bar and the popover. The active tab comes from `page.url.pathname` (`$app/state`).
+  `src/routes/+layout.svelte`. The existing
+  `const tabs = [...]` array and its `{#each}` stay. For the mobile menu, the `{#each}` is wrapped in
+  `{#snippet tabLinks()}` and rendered in both the desktop `<nav>` and the popover `<nav>`. The
+  active tab comes from `page.url.pathname` (`$app/state`).
 - App name: "CDO Fuel Price Tracker", the mock's "/ CDO" suffix dropped. On phones the name may
   wrap to two lines (`min-width: 0`, buttons `flex: none`), so the menu button never leaves the
   screen.
@@ -196,12 +201,13 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
 
 ## R13. Fonts (FR-021, D13)
 
-- Decision: 9 latin-subset `.woff2` files in `static/fonts/`: Inter 400/500/600, Montserrat
-  500/600/700, Roboto 400/500/700. One `@font-face` per file in `app.css` with
-  `font-display: swap`, `url('/fonts/<file>.woff2') format('woff2')`. Download once by hand (for
-  example from the Google Fonts static families). All three are SIL OFL 1.1, so `OFL.txt` goes in
-  `static/fonts/` with them.
-- Body `font-family: Inter, sans-serif`. Headings Montserrat, prices Roboto, as in the mock.
+- Done by the user: 9 latin-subset `.woff2` files in `static/fonts/`:
+  `inter-v20-latin/inter-v20-latin-{regular,500,600}.woff2`,
+  `montserrat-v31-latin/montserrat-v31-latin-{500,600,700}.woff2`,
+  `roboto-v51-latin/roboto-v51-latin-{regular,500,700}.woff2`, each folder with its SIL OFL 1.1
+  `OFL.txt`. One `@font-face` per file in `src/app.css` with `font-display: swap`, and
+  `body { font-family: 'Inter', sans-serif }`.
+- Headings Montserrat, prices Roboto, as in the mock.
 
 ## R14. Accessibility (FR-022, FR-023, CHK012, CHK015 to CHK018)
 
@@ -244,9 +250,10 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
 
 ## R16. Playwright data (D14)
 
-- Decision: two SQL files run with `psql` against the local stack
-  (`postgresql://postgres:postgres@127.0.0.1:54322/postgres`) from the e2e file through
-  `execSync('psql … -v ON_ERROR_STOP=1 -f …')`:
+- Decision: two SQL files run with `psql` against the local stack (`SUPABASE_DB_URL` from `.env`,
+  host `127.0.0.1` only) from the e2e file through
+  `execFileSync('psql', [url, '-v', 'ON_ERROR_STOP=1', '-f', file])`. Arguments go as an array,
+  never as one concatenated shell string (SECURITY.md 3):
   - `supabase/fixtures/empty.sql`: `truncate public.price_shift, public.price_report,
 public.station_product, public.station, public.fuel_product, public.brand restart identity
 cascade;` (cascade also clears `submission` and `admin_log` rows that point at them).
@@ -255,6 +262,16 @@ cascade;` (cascade also clears `submission` and `admin_log` rows that point at t
     dated 12 days ago with a later shift. Dates relative to `(now() at time zone 'Asia/Manila')::date`.
 - Tests run serially: empty state first, then the fixture, then the rest. The server reads the
   database on every request, so swapping data between tests needs no restart.
+- The helper loads `.env` with Node's `process.loadEnvFile('.env')` (Node 24, no dependency), reads
+  `SUPABASE_DB_URL`, and throws unless `new URL(url).hostname === '127.0.0.1'` (D21). No password
+  in code.
+- Shift dates in the fixture: every shift is dated `w = date_trunc('week', today)::date` (this
+  week's Monday in Manila). `w` is always between `today - 6` and `today`, so on every weekday the
+  shifts are in the past, they form the latest week, the `today - 12` report is older than them
+  (the 001 view applies shifts with `effective_on > observed_on`, so it gets "est."), and the
+  `today` report is not older (no "est."). A last-week Monday would fall on `today - 12` or
+  `today - 13` at weekends and break scenario 6. One diesel shift is dated `today + 3` and must
+  change neither prices nor the card.
 - Rationale: `psql` is installed and used in 001's quickstart. No new dependency. The service-role
   key stays out of the test code. `supabase/fixtures/` is outside `supabase/tests/`, so
   `supabase test db` ignores it.

@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "UI from design_handoff_fuel_price_dashboard/, first part: the public Dashboard with the shared layout, theme and responsive shell." Grilling decisions D1 to D14 are in `decisions.md`.
+**Input**: User description: "UI from design_handoff_fuel_price_dashboard/, first part: the public Dashboard with the shared layout, theme and responsive shell." Grilling decisions D1 to D22 are in `decisions.md`.
 
 ## User Scenarios & Testing _(mandatory)_
 

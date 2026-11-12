@@ -14,13 +14,15 @@ known values (data-model "URL state") and never echoed raw.
 
 ## Data reads (001 `contracts/data-api.md`, anon role)
 
-| Object          | Columns                                                                                      |
-| --------------- | -------------------------------------------------------------------------------------------- |
-| `current_price` | `station_id, product_id, price, reported_at, is_estimate`                                    |
-| `station`       | `id, street_address`, embedded `brand(name)`, `barangay(name)`                               |
-| `fuel_product`  | `id, name, category_id`                                                                      |
-| `fuel_category` | `id, name`                                                                                   |
-| `price_shift`   | `brand_id, amount, effective_on`, filtered `category_id=eq.{id}`, `effective_on=lte.{today}` |
+Exact supabase-js calls. `src/routes/page.server.spec.ts` asserts these strings and filters.
+
+| Object | `select` string | Filters and order |
+|---|---|---|
+| `current_price` | `'station_id, product_id, price, reported_at, is_estimate'` | none |
+| `station` | `'id, street_address, brand(name), barangay(name)'` | none |
+| `fuel_product` | `'id, name, category_id'` | none |
+| `fuel_category` | `'id, name'` | `.order('name')` |
+| `price_shift` | `'brand_id, amount, effective_on'` | `.eq('category_id', id)`, `.lte('effective_on', today)`, `.order('effective_on', { ascending: false })`, `.limit(1000)`, one call per category |
 
 Never selected: `price_report` (any column), `submission`, `profile`, `admin_log`.
 
@@ -29,10 +31,12 @@ Never selected: `price_report` (any column), `submission`, `profile`, `admin_log
 ```ts
 joinRows(prices, stations, products, categories): PriceRow[]   // throws on a missing station, product or category
 ageLabel(reportedAt: string, today: string): string             // "Reported today" | "Yesterday" | "N days ago"
+pickFuel(param: string | null, categories: string[]): string     // exact match, else 'gasoline'
 rankStations(rows: PriceRow[], category: string): RankedRow[]
 paginate(ranked: RankedRow[], pageParam: string | null): Page
 averageCents(ranked: RankedRow[]): number | null
 formatCents(cents: number): string                              // 6245 -> "62.45"
+barPercent(cents: number, highestCents: number): number         // Math.round(cents / highest * 100)
 summarizeShifts(shifts: { brand_id: number; amount: number; effective_on: string }[]): Adjustment
 formatAdjustment(a: Adjustment): { arrow: string; amount: string; word: string }
 formatDate(date: string): string                                // "2026-10-27" -> "Oct 27, 2026"

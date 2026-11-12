@@ -2,10 +2,10 @@
 
 **Branch**: `feat/public-dashboard` | **Date**: 2026-11-12 | **Spec**: [spec.md](spec.md)
 
-**Input**: Feature specification from `specs/002-public-dashboard/spec.md`, grill decisions D1 to D19
+**Input**: Feature specification from `specs/002-public-dashboard/spec.md`, grill decisions D1 to D22
 in `decisions.md`, design handoff in `design_handoff_fuel_price_dashboard/`.
 
-**Status**: Phase 0 and Phase 1 complete. Open decisions answered as D15 to D19. `tasks.md` written.
+**Status**: Phase 0 and Phase 1 complete. Open decisions answered as D15 to D19. Inspect fixes applied (D20 to D22). `tasks.md` written.
 
 ## Summary
 
@@ -53,7 +53,7 @@ error page.
 
 | Principle                   | Status             | How                                                                                                                                                                                                                   |
 | --------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| I. Prices derived           | Pass               | Prices come only from the `current_price` view. Ranking rows and "Cheapest in CDO" rows show report age and "est." (FR-004, FR-008, D17)                                                                              |
+| I. Prices derived           | Pass               | Prices come only from the `current_price` view. Ranking rows and "Cheapest in CDO" rows show report age and "est." (FR-004, FR-008, D17). The "City avg" line shows no age (D20): it is an aggregate of the ranked prices, each shown with its own age beside it, not one station's price                                                                              |
 | II. External data untrusted | Pass               | No third-party data. Fonts self-hosted (D13). Supabase URL and key from server env                                                                                                                                    |
 | III. Server enforces rules  | Pass               | Read only, anon role, RLS from 001. No writes, no sign-in                                                                                                                                                             |
 | IV. Test first              | Pass               | Vitest tests first for every pure function and the load failure path. Playwright smoke for "view prices" and the shell (D14). RLS unchanged, so no new pgTAP. FR-020 (visual match) is checked by eye, as D14 decided |
@@ -66,20 +66,22 @@ Re-check after Phase 1 design: no violation. Complexity Tracking is empty.
 
 Tasks tagged **SEC** in `tasks.md` need review against `SECURITY.md`:
 
-1. Secrets (T001, T004, T015): `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` are declared private in
+1. Secrets (T001, T004, T017, T021): `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` are declared private in
    `src/env.ts` and read from `$app/env/private` (server only, R9). `.env` stays ignored.
-   `.env.example` lists names only. The service-role key is never used.
-2. External service (T014, T015, T030, T031): the Supabase client is created in `+page.server.ts` with
+   `.env.example` lists names only. The service-role key is never used. `SUPABASE_DB_URL` (local
+   database URL) lives only in `.env` and is read only by the e2e helper (D21).
+2. External service (T016, T017, T032, T033): the Supabase client is created in `+page.server.ts` with
    `auth: { persistSession: false }`. No session, so one shared server client cannot leak a user.
    Production URL must be HTTPS. Failures are logged on the server without the key and shown as
    the fixed FR-014 message, never raw database text (SECURITY.md 7, 8).
-3. Contracts (T015, T031): only the columns in `contracts/dashboard.md`. Never `price_report`,
+3. Contracts (T016, T017, T032, T033): tests assert the exact columns, tables and filters; only the columns in `contracts/dashboard.md`. Never `price_report`,
    `submission`, `profile`, `admin_log`.
-4. Inline script (T036): static text in `app.html`. Reads `localStorage.theme`, accepts only `light`
+4. Inline script (T039, tested by T037 (8)): static text in `app.html`. Reads `localStorage.theme`, accepts only `light`
    or `dark`. No user data reaches HTML. CSP deferred (D19).
 5. Personal data: none read or stored. `localStorage` holds only `light` or `dark`.
-6. Fixtures (T017, T019): `supabase/fixtures/*.sql` truncate tables. The e2e file runs them only against
-   the hard-coded local URL `127.0.0.1:54322`.
+6. Fixtures (T019, T020, T021): `supabase/fixtures/*.sql` truncate tables. The e2e helper reads
+   `SUPABASE_DB_URL` from `.env` and refuses any host other than `127.0.0.1` (D21). No password in
+   code (SECURITY.md 2).
 7. Access rules, sign-in, data model, minors' data: not touched.
 
 ## Checklist answers (`checklists/ux.md`)
@@ -125,14 +127,14 @@ specs/002-public-dashboard/
 ### Source Code (repository root)
 
 ```text
-.env.example                         # names only
+.env.example                         # names only: SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_DB_URL
 src/
 ├── app.html                         # inline script: apply saved theme (D18)
-├── app.css                          # tokens rewritten with light-dark() (D18), fonts, base, focus, reduced motion
+├── app.css                          # @font-face and body font done; tokens to rewrite with light-dark() (D18); focus, reduced motion
 ├── env.ts                           # defineEnvVars (Kit 3, R9)
 ├── lib/
-│   ├── components/Header.svelte     # exists (empty, user's file): name, tabs, menu, mode toggle
-│   ├── dashboard.ts                 # types and pure functions
+│   ├── components/Header.svelte     # exists (user's file, a749934): logo, tabs, underline done; toggle and mobile menu to add
+│   ├── dashboard.ts                 # types and pure functions (incl. pickFuel)
 │   └── dashboard.spec.ts            # Vitest, written first
 └── routes/
     ├── +layout.svelte               # exists: imports app.css, renders <Header />
@@ -140,11 +142,11 @@ src/
     ├── +page.server.ts              # load
     ├── page.server.spec.ts          # Vitest, load failure path (FR-014)
     ├── +page.svelte                 # Dashboard cards
-    ├── analytics/+page.svelte       # Coming soon
-    ├── contribute/+page.svelte      # Coming soon
+    ├── analytics/+page.svelte       # exists, empty: Coming soon
+    ├── contribute/+page.svelte      # exists, empty: Coming soon
     ├── dashboard.e2e.ts             # Playwright: US1
     └── shell.e2e.ts                 # Playwright: US3
-static/fonts/                        # 9 .woff2 + OFL.txt
+static/fonts/                        # done: inter-v20-latin/, montserrat-v31-latin/, roboto-v51-latin/, each with 3 .woff2 + OFL.txt
 supabase/fixtures/
 ├── empty.sql
 └── dashboard.sql
@@ -161,3 +163,25 @@ The three cards stay in `+page.svelte` because nothing else uses them.
 ## Complexity Tracking
 
 Empty.
+
+## Validate
+
+Date: 2026-11-12. Verdict: CONDITIONAL
+
+| Check                     | Verdict | Findings   |
+| ------------------------- | ------- | ---------- |
+| 1. Setup and dependencies | PASS    | none       |
+| 2. Test coverage          | CONCERN | F1, F3, F6 |
+| 3. Breaking changes       | PASS    | none       |
+| 4. Security and privacy   | CONCERN | F2         |
+
+Check 1: `@supabase/supabase-js` 2.119.0, Node 24.15.0 (`process.loadEnvFile` present), Supabase
+CLI 2.122.0, `psql` 18.6, Docker 29.9.3, Playwright Chromium installed, `defineEnvVars` in Kit.
+Local stack runs. `.env` and `.env.example` are missing, covered by T001. Check 3: no schema
+change. The scaffold files T002 deletes have no callers. Earlier F1, F2, F10, F11 and F13 are
+resolved (T014/T015 and T037 (8), recorded mock calls in T016/T032, T006 and T016 (d), D21, D22).
+
+F1. tasks.md:83 (T020) `w` (last week's Monday) falls on `today - 12` on Saturdays and `today - 13` on Sundays (Manila). The 001 view applies only shifts with `effective_on > observed_on`, so the brand A gasoline shift does not apply to the 12-day report and T021 (4) "12 days ago · est." fails every weekend (checked in psql) -> st-plan: set `w = date_trunc('week', today)::date` (this week's Monday, always `>= today - 6`) and put both brands' shifts on `w`, or date that report at `w - 1` and assert its computed age. Update T034 "As of" and R16 to match. Different dates in one week stay covered by T028.
+F2. tasks.md:84 (T021), research.md:254 The e2e helper builds the `psql` command by string concatenation (`execSync('psql "' + url + '" …')`). SECURITY.md:39 forbids shell commands built by concatenation -> st-plan: `execFileSync('psql', [url, '-v', 'ON_ERROR_STOP=1', '-f', file])`.
+F3. tasks.md:76 (T016 (a)) `today` is only checked against `/^\d{4}-\d{2}-\d{2}$/`. A UTC date passes, yet would shift every age label and the shift filter by one day from 00:00 to 08:00 Manila -> st-plan: add a case with `vi.useFakeTimers()` and `vi.setSystemTime(new Date('2026-11-11T17:00:00Z'))` expecting `today` `'2026-11-12'`.
+F6. tasks.md:89 (T023) Bar width `Math.round(cents / highest * 100)` (FR-007) has no test. T021 (5) checks only the average -> st-plan: assert in T021 that the most expensive ranked row's bar is 100% wide, or move the formula into `dashboard.ts` with a Vitest case.
