@@ -1,6 +1,12 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { resolve } from '$app/paths';
+	import { afterNavigate } from '$app/navigation';
+
+	let menu: HTMLElement | undefined = $state();
+
+	// Choosing a tab in the open mobile menu navigates; close the menu once the new page is shown
+	afterNavigate(() => menu?.hidePopover());
 
 	const tabs = [
 		{ label: 'Dashboard', href: resolve('/') },
@@ -29,12 +35,16 @@
 		CDO Fuel Price Tracker
 	</a>
 
-	<nav aria-label="Main">
+	{#snippet tabLinks()}
 		{#each tabs as tab (tab.href)}
 			<a href={tab.href} aria-current={page.url.pathname === tab.href ? 'page' : undefined}>
 				{tab.label}
 			</a>
 		{/each}
+	{/snippet}
+
+	<nav class="tabs" aria-label="Main">
+		{@render tabLinks()}
 	</nav>
 
 	<button type="button" class="mode" onclick={toggleMode}>
@@ -46,7 +56,15 @@
 		</span>
 	</button>
 
-	<!-- TODO: mobile menu button -->
+	<!-- The native popover gives Escape, click-outside closing and focus return for free -->
+	<button type="button" class="menu-button" popovertarget="site-menu" aria-label="Menu">
+		<span class="burger" aria-hidden="true">☰</span>
+		<span class="close" aria-hidden="true">✕</span>
+	</button>
+
+	<nav id="site-menu" class="menu" popover aria-label="Main" bind:this={menu}>
+		{@render tabLinks()}
+	</nav>
 </header>
 
 <style>
@@ -87,7 +105,8 @@
 		background: var(--accent);
 	}
 
-	nav {
+	/* A class, not `nav`: display: flex on the popover would override the browser's hidden state */
+	.tabs {
 		display: flex;
 		gap: 6px;
 		height: 100%;
@@ -119,8 +138,12 @@
 	}
 
 	.mode {
-		flex: none;
 		margin-left: auto;
+	}
+
+	.mode,
+	.menu-button {
+		flex: none;
 		width: 38px;
 		height: 38px;
 		box-sizing: border-box;
@@ -136,7 +159,71 @@
 		transition: background 0.2s;
 	}
 
-	.mode:hover {
+	.mode:hover,
+	.menu-button:hover {
 		background: var(--soft);
+	}
+
+	.menu-button {
+		display: none;
+		font-size: 18px;
+	}
+
+	.close,
+	header:has(.menu:popover-open) .burger {
+		display: none;
+	}
+
+	header:has(.menu:popover-open) .close {
+		display: inline;
+	}
+
+	@media (max-width: 767px) {
+		header {
+			gap: 10px;
+			height: 60px;
+			padding: 0 16px;
+		}
+
+		/* Lets the name wrap instead of pushing the buttons off screen */
+		.logo {
+			min-width: 0;
+		}
+
+		.tabs {
+			display: none;
+		}
+
+		.menu-button {
+			display: grid;
+		}
+
+		.menu:popover-open {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.menu {
+			inset: 60px 0 auto 0;
+			width: auto;
+			margin: 0;
+			padding: 8px;
+			border: 0;
+			border-bottom: 1px solid var(--line);
+			background: var(--card);
+			color: var(--ink);
+			box-shadow: var(--raised);
+		}
+
+		.menu a {
+			height: auto;
+			padding: 14px 12px;
+			border-radius: 10px;
+			font-size: 15px;
+		}
+
+		.menu a[aria-current='page'] {
+			background-color: var(--soft);
+		}
 	}
 </style>

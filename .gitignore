@@ -36,3 +36,5 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 # Playwright
 test-results
+
+.claude/settings.local.json
