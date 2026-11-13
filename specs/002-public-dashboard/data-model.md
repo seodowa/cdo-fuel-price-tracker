@@ -2,8 +2,9 @@
 
 No database change. The 001 tables and the `current_price` view are read as they are
 (`specs/001-database-schema/data-model.md`). This file defines the TypeScript shapes the load
-function and the pure functions in `src/lib/dashboard.ts` pass around. Money is integer centavos
-(research R4). Dates are `YYYY-MM-DD` strings (research R3).
+function and the pure functions in `src/lib/dashboard-functions.ts` pass around. Source rows live in
+`src/lib/models/database.ts`, the other shapes in `src/lib/models/dashboard.ts`. Money is integer
+centavos (research R4). Dates are `YYYY-MM-DD` strings (research R3).
 
 ## Source rows (from PostgREST, research R1)
 
@@ -68,10 +69,10 @@ Rules: research R6.
 
 ## URL state (read by `src/routes/+page.svelte`, research R2)
 
-| Param  | Values                  | Default / invalid         |
-| ------ | ----------------------- | ------------------------- |
-| `fuel` | a name in `categories`, exact match (`pickFuel`) | `gasoline` |
-| `page` | integer 1 .. page count | 1, and clamped into range |
+| Param  | Values                                           | Default / invalid         |
+| ------ | ------------------------------------------------ | ------------------------- |
+| `fuel` | a name in `categories`, exact match (`pickFuel`) | `gasoline`                |
+| `page` | integer 1 .. page count                          | 1, and clamped into range |
 
 Page size: 10 (D11).
 

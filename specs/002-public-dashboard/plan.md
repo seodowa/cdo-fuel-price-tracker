@@ -14,7 +14,7 @@ Build the public Dashboard and the shared app shell in SvelteKit. A server load 
 `price_shift` from the 001 data layer with `@supabase/supabase-js` and the publishable key (D15).
 It joins them into flat price rows and summarizes the latest week of shifts per fuel. The page
 derives the ranking, "Cheapest in CDO", the city average, pagination and age labels with pure,
-Vitest-tested functions in `src/lib/dashboard.ts`. The selected fuel and page live in the URL
+Vitest-tested functions in `src/lib/dashboard-functions.ts`. The selected fuel and page live in the URL
 (`?fuel=diesel&page=2`), so they work without JavaScript and need no refetch. `Header.svelte`
 holds the name, tabs, mobile menu (native popover) and mode toggle. Colour tokens use CSS
 `light-dark()`, so the first visit follows the device even without JavaScript. A small inline
@@ -51,14 +51,14 @@ error page.
 
 ## Constitution Check
 
-| Principle                   | Status             | How                                                                                                                                                                                                                   |
-| --------------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| I. Prices derived           | Pass               | Prices come only from the `current_price` view. Ranking rows and "Cheapest in CDO" rows show report age and "est." (FR-004, FR-008, D17). The "City avg" line shows no age (D20): it is an aggregate of the ranked prices, each shown with its own age beside it, not one station's price                                                                              |
-| II. External data untrusted | Pass               | No third-party data. Fonts self-hosted (D13). Supabase URL and key from server env                                                                                                                                    |
-| III. Server enforces rules  | Pass               | Read only, anon role, RLS from 001. No writes, no sign-in                                                                                                                                                             |
-| IV. Test first              | Pass               | Vitest tests first for every pure function and the load failure path. Playwright smoke for "view prices" and the shell (D14). RLS unchanged, so no new pgTAP. FR-020 (visual match) is checked by eye, as D14 decided |
-| V. Simplest thing           | Pass               | One dependency, approved (D15). Platform first: URL state, popover, `light-dark()`, CSS icon swap, `text-transform` for fuel labels                                                                                   |
-| Security constraints        | Pass, CSP deferred | Publishable key read on the server only. Invented fixtures. CSP deferred to a hardening spec before the first deploy (D19, `OPEN-QUESTIONS.md` 2026-11-12)                                                            |
+| Principle                   | Status             | How                                                                                                                                                                                                                                                                                       |
+| --------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| I. Prices derived           | Pass               | Prices come only from the `current_price` view. Ranking rows and "Cheapest in CDO" rows show report age and "est." (FR-004, FR-008, D17). The "City avg" line shows no age (D20): it is an aggregate of the ranked prices, each shown with its own age beside it, not one station's price |
+| II. External data untrusted | Pass               | No third-party data. Fonts self-hosted (D13). Supabase URL and key from server env                                                                                                                                                                                                        |
+| III. Server enforces rules  | Pass               | Read only, anon role, RLS from 001. No writes, no sign-in                                                                                                                                                                                                                                 |
+| IV. Test first              | Pass               | Vitest tests first for every pure function and the load failure path. Playwright smoke for "view prices" and the shell (D14). RLS unchanged, so no new pgTAP. FR-020 (visual match) is checked by eye, as D14 decided                                                                     |
+| V. Simplest thing           | Pass               | One dependency, approved (D15). Platform first: URL state, popover, `light-dark()`, CSS icon swap, `text-transform` for fuel labels                                                                                                                                                       |
+| Security constraints        | Pass, CSP deferred | Publishable key read on the server only. Invented fixtures. CSP deferred to a hardening spec before the first deploy (D19, `OPEN-QUESTIONS.md` 2026-11-12)                                                                                                                                |
 
 Re-check after Phase 1 design: no violation. Complexity Tracking is empty.
 
@@ -134,8 +134,11 @@ src/
 ├── env.ts                           # defineEnvVars (Kit 3, R9)
 ├── lib/
 │   ├── components/Header.svelte     # exists (user's file, a749934): logo, tabs, underline done; toggle and mobile menu to add
-│   ├── dashboard.ts                 # types and pure functions (incl. pickFuel)
-│   └── dashboard.spec.ts            # Vitest, written first
+│   ├── models/
+│   │   ├── database.ts              # source row types, as the contract selects return them
+│   │   └── dashboard.ts             # PriceRow, RankedRow, Page, Adjustment
+│   ├── dashboard-functions.ts       # pure functions (incl. pickFuel)
+│   └── dashboard-functions.spec.ts  # Vitest, written first
 └── routes/
     ├── +layout.svelte               # exists: imports app.css, renders <Header />
     ├── +error.svelte                # FR-014
@@ -143,9 +146,10 @@ src/
     ├── page.server.spec.ts          # Vitest, load failure path (FR-014)
     ├── +page.svelte                 # Dashboard cards
     ├── analytics/+page.svelte       # exists, empty: Coming soon
-    ├── contribute/+page.svelte      # exists, empty: Coming soon
-    ├── dashboard.e2e.ts             # Playwright: US1
-    └── shell.e2e.ts                 # Playwright: US3
+    └── contribute/+page.svelte      # exists, empty: Coming soon
+tests/e2e/                           # Playwright (testDir); unit tests stay beside their source
+├── dashboard.e2e.ts                 # US1
+└── shell.e2e.ts                     # US3
 static/fonts/                        # done: inter-v20-latin/, montserrat-v31-latin/, roboto-v51-latin/, each with 3 .woff2 + OFL.txt
 supabase/fixtures/
 ├── empty.sql
@@ -154,8 +158,9 @@ supabase/fixtures/
 
 Removed: `src/routes/page.svelte.e2e.ts` and `src/lib/vitest-examples/` (scaffold samples).
 
-**Structure Decision**: SvelteKit default layout. Pure logic in one `src/lib/dashboard.ts` so it is
-tested without a browser or database. The header is one component because the user created it.
+**Structure Decision**: SvelteKit default layout. Pure logic in one `src/lib/dashboard-functions.ts` so it is
+tested without a browser or database. Types live in `src/lib/models/`: `database.ts` for rows as
+the database returns them (reused by 003 and 004), `dashboard.ts` for the Dashboard's own shapes. The header is one component because the user created it.
 The three cards stay in `+page.svelte` because nothing else uses them.
 
 **Rollback**: nothing is deployed. Revert the commits. No migration.

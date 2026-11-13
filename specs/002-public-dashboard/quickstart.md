@@ -20,8 +20,8 @@ Proves SC-001 to SC-003 (Vitest), the D14 smoke flows (Playwright), SC-005 (no f
 ```sh
 npm run check          # svelte-check, strict TypeScript
 npm run lint           # prettier + eslint
-npm run test:unit -- --run   # Vitest: src/lib/dashboard.spec.ts, src/routes/page.server.spec.ts
-npm run test:e2e       # Playwright: build, preview on :4173, src/routes/dashboard.e2e.ts and shell.e2e.ts
+npm run test:unit -- --run   # Vitest: src/lib/dashboard-functions.spec.ts, src/routes/page.server.spec.ts
+npm run test:e2e       # Playwright: build, preview on :4173, tests/e2e/dashboard.e2e.ts and shell.e2e.ts
 ```
 
 The e2e run truncates price tables in the local database (`supabase/fixtures/empty.sql`). Run

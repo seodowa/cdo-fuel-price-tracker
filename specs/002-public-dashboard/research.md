@@ -164,7 +164,7 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
 
 - `$lib` is removed in Kit 3. Use `#lib` (Node subpath import in `package.json`, `"#lib/*":
 "./src/lib/*"`). The mapping adds no extension, and the generated tsconfig sets
-  `allowImportingTsExtensions`, so import `#lib/dashboard.ts` with the extension. Confirm with
+  `allowImportingTsExtensions`, so import `#lib/dashboard-functions.ts` with the extension. Confirm with
   `npm run check` in the first task that uses it.
 - `eslint-plugin-svelte` recommended config enables `svelte/no-navigation-without-resolve`. Build
   hrefs with `resolve()` from `$app/paths`, for example `resolve('/analytics')` and the query

@@ -26,7 +26,7 @@ Exact supabase-js calls. `src/routes/page.server.spec.ts` asserts these strings 
 
 Never selected: `price_report` (any column), `submission`, `profile`, `admin_log`.
 
-## Pure functions (`src/lib/dashboard.ts`)
+## Pure functions (`src/lib/dashboard-functions.ts`)
 
 ```ts
 joinRows(prices, stations, products, categories): PriceRow[]   // throws on a missing station, product or category
@@ -43,7 +43,7 @@ formatDate(date: string): string                                // "2026-10-27" 
 ```
 
 Parameter shapes for `joinRows` are the source rows in `data-model.md`. Each function has Vitest
-cases in `src/lib/dashboard.spec.ts`, written before it.
+cases in `src/lib/dashboard-functions.spec.ts`, written before it.
 
 ## Displayed text (fixed strings)
 
