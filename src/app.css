@@ -73,46 +73,52 @@
 :root {
 	--h: 190; /* Teal (the default). Violet 285, Amber 65, Forest 150, Crimson 18 */
 
-	/* Dark ("Night ledger") is the default */
+	/* No saved choice: follow the device. light-dark(<light>, <dark>) picks by color-scheme */
+	color-scheme: light dark;
+	--bg: light-dark(oklch(0.875 0.012 var(--h)), oklch(0.19 0.02 var(--h)));
+	--card: light-dark(oklch(0.915 0.01 var(--h)), oklch(0.245 0.02 var(--h)));
+	--line: light-dark(oklch(0.8 0.014 var(--h)), oklch(0.33 0.02 var(--h)));
+	--ink: light-dark(oklch(0.22 0.02 var(--h)), oklch(0.96 0.01 var(--h)));
+	--muted: light-dark(oklch(0.38 0.02 var(--h)), oklch(0.74 0.02 var(--h)));
+	--accent: light-dark(oklch(0.44 0.11 var(--h)), oklch(0.8 0.15 var(--h)));
+	--on-accent: light-dark(oklch(0.95 0.01 var(--h)), oklch(0.2 0.03 var(--h)));
+	--soft: light-dark(oklch(0.84 0.03 var(--h)), oklch(0.31 0.05 var(--h)));
+	--mid: light-dark(oklch(0.62 0.09 var(--h)), oklch(0.5 0.1 var(--h)));
+	--up: light-dark(oklch(0.45 0.17 25), oklch(0.74 0.17 25));
+	--up-bg: light-dark(oklch(0.84 0.05 25), oklch(0.32 0.07 25));
+	--down: light-dark(oklch(0.4 0.12 150), oklch(0.8 0.15 150));
+	--down-bg: light-dark(oklch(0.84 0.05 150), oklch(0.32 0.07 150));
+	--series-1: light-dark(oklch(0.44 0.11 var(--h)), oklch(0.8 0.15 var(--h)));
+	--series-2: light-dark(
+		oklch(0.46 0.12 calc(var(--h) + 140)),
+		oklch(0.8 0.13 calc(var(--h) + 140))
+	);
+	--series-3: light-dark(
+		oklch(0.42 0.08 calc(var(--h) + 250)),
+		oklch(0.82 0.1 calc(var(--h) + 250))
+	);
+
+	/* Shadows aren't colours, so light-dark() can't hold them. Dark ("Night ledger") first */
+	--shadow: none;
+	--raised: 0 8px 24px #0006;
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+		--shadow: 0 1px 2px oklch(0.3 0.02 var(--h) / 0.06), 0 6px 20px oklch(0.3 0.02 var(--h) / 0.07);
+		--raised: 0 10px 30px oklch(0.3 0.02 var(--h) / 0.14);
+	}
+}
+
+/* A saved choice from the toggle overrides the device. Must come after the media query */
+[data-theme='dark'] {
 	color-scheme: dark;
-	--bg: oklch(0.19 0.02 var(--h));
-	--card: oklch(0.245 0.02 var(--h));
-	--line: oklch(0.33 0.02 var(--h));
-	--ink: oklch(0.96 0.01 var(--h));
-	--muted: oklch(0.74 0.02 var(--h));
-	--accent: oklch(0.8 0.15 var(--h));
-	--on-accent: oklch(0.2 0.03 var(--h));
-	--soft: oklch(0.31 0.05 var(--h));
-	--mid: oklch(0.5 0.1 var(--h));
-	--up: oklch(0.74 0.17 25);
-	--up-bg: oklch(0.32 0.07 25);
-	--down: oklch(0.8 0.15 150);
-	--down-bg: oklch(0.32 0.07 150);
-	--series-1: oklch(0.8 0.15 var(--h));
-	--series-2: oklch(0.8 0.13 calc(var(--h) + 140));
-	--series-3: oklch(0.82 0.1 calc(var(--h) + 250));
 	--shadow: none;
 	--raised: 0 8px 24px #0006;
 }
 
 [data-theme='light'] {
 	color-scheme: light;
-	--bg: oklch(0.875 0.012 var(--h));
-	--card: oklch(0.915 0.01 var(--h));
-	--line: oklch(0.8 0.014 var(--h));
-	--ink: oklch(0.22 0.02 var(--h));
-	--muted: oklch(0.38 0.02 var(--h));
-	--accent: oklch(0.44 0.11 var(--h));
-	--on-accent: oklch(0.95 0.01 var(--h));
-	--soft: oklch(0.84 0.03 var(--h));
-	--mid: oklch(0.62 0.09 var(--h));
-	--up: oklch(0.45 0.17 25);
-	--up-bg: oklch(0.84 0.05 25);
-	--down: oklch(0.4 0.12 150);
-	--down-bg: oklch(0.84 0.05 150);
-	--series-1: oklch(0.44 0.11 var(--h));
-	--series-2: oklch(0.46 0.12 calc(var(--h) + 140));
-	--series-3: oklch(0.42 0.08 calc(var(--h) + 250));
 	--shadow: 0 1px 2px oklch(0.3 0.02 var(--h) / 0.06), 0 6px 20px oklch(0.3 0.02 var(--h) / 0.07);
 	--raised: 0 10px 30px oklch(0.3 0.02 var(--h) / 0.14);
 }
@@ -127,4 +133,43 @@ body {
 a {
 	text-decoration: none;
 	color: inherit;
+}
+
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.to-dark {
+	display: none;
+}
+
+@media (prefers-color-scheme: light) {
+	.to-light {
+		display: none;
+	}
+	.to-dark {
+		display: inline;
+	}
+}
+
+/* A saved choice beats the device setting (higher specificity) */
+[data-theme='dark'] .to-light {
+	display: inline;
+}
+[data-theme='dark'] .to-dark {
+	display: none;
+}
+[data-theme='light'] .to-light {
+	display: none;
+}
+[data-theme='light'] .to-dark {
+	display: inline;
 }

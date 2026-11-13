@@ -2,7 +2,7 @@
 	import favicon from '#lib/assets/favicon.svg';
 	import type { LayoutProps } from './$types';
 	import '../app.css';
-	import Header from '../lib/components/Header.svelte';
+	import Header from '#lib/components/Header.svelte';
 
 	let { children }: LayoutProps = $props();
 </script>
