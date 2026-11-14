@@ -135,6 +135,20 @@ a {
 	color: inherit;
 }
 
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+
+/* Users who ask the OS for less motion get instant state changes */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		transition: none !important;
+	}
+}
+
 .visually-hidden {
 	position: absolute;
 	width: 1px;
