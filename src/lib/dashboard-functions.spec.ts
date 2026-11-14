@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { joinRows } from './dashboard-functions.ts';
+import { ageLabel, joinRows } from './dashboard-functions.ts';
 import type { CategoryRow, CurrentPriceRow, ProductRow, StationRow } from './models/database.ts';
 
 // Invented stations and products, never real data
@@ -57,5 +57,31 @@ describe('joinRows', () => {
 	it('throws when the category is missing', () => {
 		const orphan: ProductRow[] = [{ ...products[0], category_id: 101 }];
 		expect(() => joinRows([price], stations, orphan, categories)).toThrow();
+	});
+});
+
+describe('ageLabel', () => {
+	it('says "Reported today" on the same day', () => {
+		expect(ageLabel('2026-11-14', '2026-11-14')).toBe('Reported today');
+	});
+
+	it('says "Reported today" for a future date', () => {
+		expect(ageLabel('2026-11-15', '2026-11-14')).toBe('Reported today');
+	});
+
+	it('says "Yesterday" after one day', () => {
+		expect(ageLabel('2026-11-13', '2026-11-14')).toBe('Yesterday');
+	});
+
+	it('counts days after that', () => {
+		expect(ageLabel('2026-11-02', '2026-11-14')).toBe('12 days ago');
+	});
+
+	it('counts across a month end', () => {
+		expect(ageLabel('2026-02-27', '2026-03-01')).toBe('2 days ago');
+	});
+
+	it('counts across a year end', () => {
+		expect(ageLabel('2026-12-31', '2027-01-02')).toBe('2 days ago');
 	});
 });

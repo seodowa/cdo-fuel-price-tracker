@@ -1,5 +1,6 @@
 # Stratum and agent files (kept local)
-.stratum/
+.stratum/*
+!.stratum/handoff.md
 AGENTS.md
 CLAUDE.md
 OPEN-QUESTIONS.md

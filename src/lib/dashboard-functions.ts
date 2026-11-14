@@ -35,3 +35,18 @@ export function joinRows(
 		};
 	});
 }
+
+// Whole calendar days from reportedAt to today, both 'YYYY-MM-DD'. Date.UTC keeps the device's
+// time zone and daylight saving out of the count.
+export function ageLabel(reportedAt: string, today: string): string {
+	const day = (date: string) => {
+		const [y, m, d] = date.split('-').map(Number);
+		return Date.UTC(y, m - 1, d); // Months count from 0
+	};
+	// 24 hours × 60 minutes × 60 seconds × 1000 ms = 86,400,000 ms in one day
+	const days = Math.round((day(today) - day(reportedAt)) / 86_400_000);
+
+	if (days <= 0) return 'Reported today';
+	if (days === 1) return 'Yesterday';
+	return `${days} days ago`;
+}
