@@ -56,7 +56,9 @@ test.describe('desktop', () => {
 		test(`(3) ${name} shows Coming soon and its tab is current`, async ({ page }) => {
 			await page.goto(`/${name.toLowerCase()}`);
 
-			await expect(page.getByText('Coming soon')).toBeVisible();
+			await expect(page).toHaveTitle(`${name} · CDO Fuel Price Tracker`);
+			await expect(page.getByRole('heading', { level: 1, name })).toBeVisible();
+			await expect(page.getByText('Coming soon', { exact: true })).toBeVisible();
 			await expect(
 				page.getByRole('banner').getByRole('link', { name, exact: true })
 			).toHaveAttribute('aria-current', 'page');
