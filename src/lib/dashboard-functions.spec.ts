@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { ageLabel, joinRows } from './dashboard-functions.ts';
+import { ageLabel, joinRows, rankStations } from './dashboard-functions.ts';
 import type { CategoryRow, CurrentPriceRow, ProductRow, StationRow } from './models/database.ts';
+import type { PriceRow } from './models/dashboard.ts';
 
 // Invented stations and products, never real data
 const stations: StationRow[] = [
@@ -20,6 +21,35 @@ const price: CurrentPriceRow = {
 	reported_at: '2026-11-10',
 	is_estimate: true
 };
+
+// Defaults for a ranking row, so each test only spells out what it is about
+const row = (overrides: Partial<PriceRow>): PriceRow => ({
+	stationId: 1,
+	brand: 'Alpha Fuel',
+	street: '12 Sample St',
+	barangay: 'Lapu',
+	product: 'Alpha Regular 91',
+	category: 'gasoline',
+	cents: 6245,
+	reportedAt: '2026-11-10',
+	isEstimate: false,
+	...overrides
+});
+
+// Mixed stations and categories, deliberately out of price order
+const rows: PriceRow[] = [
+	// Station 4: one gasoline product, the most expensive
+	row({ stationId: 4, brand: 'Delta Oil', street: '3 Narra Ave', barangay: 'Carmen', product: 'Delta Super 91', cents: 6500 }),
+	// Station 1: two gasoline products, only Xtra Advance 91 at 6245 should be ranked
+	row({ stationId: 1, product: 'Blaze 95', cents: 6810 }),
+	row({ stationId: 1, product: 'Xtra Advance 91', cents: 6245 }),
+	// Station 2: diesel only, so it must not appear in the gasoline or kerosene rankings
+	row({ stationId: 2, brand: 'Bravo Gas', street: '8 Molave St', barangay: 'Nazareth', product: 'Bravo Diesel', category: 'diesel', cents: 5890 }),
+	// Station 3: the cheapest gasoline, and the only kerosene
+	row({ stationId: 3, brand: 'Charlie Petrol', street: '21 Acacia Rd', barangay: 'Kauswagan', product: 'Charlie Unleaded 91', cents: 6120 }),
+	row({ stationId: 3, brand: 'Charlie Petrol', street: '21 Acacia Rd', barangay: 'Kauswagan', product: 'Charlie Kerosene', category: 'kerosene', cents: 7050 })
+];
+
 
 describe('joinRows', () => {
 	it('joins a price to its station, product and category names', () => {
@@ -83,5 +113,58 @@ describe('ageLabel', () => {
 
 	it('counts across a year end', () => {
 		expect(ageLabel('2026-12-31', '2027-01-02')).toBe('2 days ago');
+	});
+});
+
+describe("rankStations", () => {
+	it('ranks the cheapest price of gasoline', () => {
+		expect(rankStations(rows, "gasoline")).toEqual([
+			{ ...rows[4], rank: 1 }, // Station 3, Charlie Unleaded 91 at 6120
+			{ ...rows[2], rank: 2 }, // Station 1, Xtra Advance 91 at 6245 (Blaze 95 dropped)
+			{ ...rows[0], rank: 3 } // Station 4, Delta Super 91 at 6500
+		])
+	});
+
+	it('leaves out stations without that category', () => {
+		// Station 2 sells only diesel
+		expect(rankStations(rows, 'kerosene')).toEqual([{ ...rows[5], rank: 1 }]);
+	});
+
+	// Each tie test lists the rows in the wrong order, so a passing test proves the sort moved them
+	it('breaks same price by newer reportedAt', () => {
+		const older = row({ stationId: 1, reportedAt: '2026-11-10' });
+		const newer = row({ stationId: 2, reportedAt: '2026-11-12' });
+		expect(rankStations([older, newer], 'gasoline')).toEqual([
+			{ ...newer, rank: 1 },
+			{ ...older, rank: 2 }
+		]);
+	});
+
+	it('breaks same price and date by brand', () => {
+		const bravo = row({ stationId: 1, brand: 'Bravo Gas' });
+		const alpha = row({ stationId: 2, brand: 'Alpha Fuel' });
+		expect(rankStations([bravo, alpha], 'gasoline')).toEqual([
+			{ ...alpha, rank: 1 },
+			{ ...bravo, rank: 2 }
+		]);
+	});
+
+	it('breaks same price, date and brand by "{street}, {barangay}"', () => {
+		const bamboo = row({ stationId: 1, street: '5 Bamboo St' });
+		const acacia = row({ stationId: 2, street: '5 Acacia St' });
+		expect(rankStations([bamboo, acacia], 'gasoline')).toEqual([
+			{ ...acacia, rank: 1 },
+			{ ...bamboo, rank: 2 }
+		]);
+	});
+
+	it('keeps the smaller product name when one station has two products at the same price', () => {
+		const xtra = row({ stationId: 1, product: 'Xtra Advance 91', cents: 6500 });
+		const blaze = row({ stationId: 1, product: 'Blaze 95', cents: 6500 });
+		expect(rankStations([xtra, blaze], 'gasoline')).toEqual([{ ...blaze, rank: 1 }]);
+	});
+
+	it('returns [] for no rows', () => {
+		expect(rankStations([], 'gasoline')).toEqual([]);
 	});
 });

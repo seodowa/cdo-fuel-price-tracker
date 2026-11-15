@@ -1,5 +1,5 @@
 import type { CategoryRow, CurrentPriceRow, ProductRow, StationRow } from './models/database.ts';
-import type { PriceRow } from './models/dashboard.ts';
+import type { PriceRow, RankedRow } from './models/dashboard.ts';
 
 // Joins each current price to its station, product and category names. A missing lookup means
 // the database broke a foreign key, so it throws instead of showing a half-empty row.
@@ -49,4 +49,14 @@ export function ageLabel(reportedAt: string, today: string): string {
 	if (days <= 0) return 'Reported today';
 	if (days === 1) return 'Yesterday';
 	return `${days} days ago`;
+}
+
+
+export function rankStations(rows: PriceRow[], category: string): RankedRow[] {
+	return rows.map( (row) => {
+		return {
+			...row,
+			rank: 1
+		}
+	});
 }
