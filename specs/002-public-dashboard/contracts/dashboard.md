@@ -16,13 +16,13 @@ known values (data-model "URL state") and never echoed raw.
 
 Exact supabase-js calls. `src/routes/page.server.spec.ts` asserts these strings and filters.
 
-| Object | `select` string | Filters and order |
-|---|---|---|
-| `current_price` | `'station_id, product_id, price, reported_at, is_estimate'` | none |
-| `station` | `'id, street_address, brand(name), barangay(name)'` | none |
-| `fuel_product` | `'id, name, category_id'` | none |
-| `fuel_category` | `'id, name'` | `.order('name')` |
-| `price_shift` | `'brand_id, amount, effective_on'` | `.eq('category_id', id)`, `.lte('effective_on', today)`, `.order('effective_on', { ascending: false })`, `.limit(1000)`, one call per category |
+| Object          | `select` string                                             | Filters and order                                                                                                                              |
+| --------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `current_price` | `'station_id, product_id, price, reported_at, is_estimate'` | none                                                                                                                                           |
+| `station`       | `'id, street_address, brand(name), barangay(name)'`         | none                                                                                                                                           |
+| `fuel_product`  | `'id, name, category_id'`                                   | none                                                                                                                                           |
+| `fuel_category` | `'id, name'`                                                | `.order('name')`                                                                                                                               |
+| `price_shift`   | `'brand_id, amount, effective_on'`                          | `.eq('category_id', id)`, `.lte('effective_on', today)`, `.order('effective_on', { ascending: false })`, `.limit(1000)`, one call per category |
 
 Never selected: `price_report` (any column), `submission`, `profile`, `admin_log`.
 

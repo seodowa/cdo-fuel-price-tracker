@@ -51,12 +51,40 @@ export function ageLabel(reportedAt: string, today: string): string {
 	return `${days} days ago`;
 }
 
-
 export function rankStations(rows: PriceRow[], category: string): RankedRow[] {
-	return rows.map( (row) => {
+	// Ensure unique stations, and keep each station's cheapest product
+	// a tie goes to the name that sorts first
+	const cheapestPerStation = new Map<number, PriceRow>();
+
+	for (const row of rows) {
+		if (row.category !== category) continue;
+
+		const stationCheapest = cheapestPerStation.get(row.stationId);
+
+		if (
+			stationCheapest === undefined ||
+			stationCheapest.cents > row.cents ||
+			(stationCheapest.cents === row.cents &&
+				stationCheapest.product.localeCompare(row.product, 'en') > 0)
+		) {
+			cheapestPerStation.set(row.stationId, row);
+		}
+	}
+
+	// Sort by price ascending/latest report/brand/location alphabetically
+	const sortedStations = [...cheapestPerStation.values()].sort((a, b) => {
+		return (
+			a.cents - b.cents ||
+			b.reportedAt.localeCompare(a.reportedAt, 'en') ||
+			a.brand.localeCompare(b.brand, 'en') ||
+			`${a.street}, ${a.barangay}`.localeCompare(`${b.street}, ${b.barangay}`, 'en')
+		);
+	});
+
+	return sortedStations.map((row, index) => {
 		return {
 			...row,
-			rank: 1
-		}
+			rank: index + 1
+		};
 	});
 }

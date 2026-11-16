@@ -29,10 +29,10 @@ The e2e run truncates price tables in the local database (`supabase/fixtures/emp
 
 ## Expected
 
-| Step        | Expected                                                                                                                                                                                                                   |
-| ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| check, lint | no errors                                                                                                                                                                                                                  |
-| Vitest      | every case in both spec files passes                                                                                                                                                                                       |
+| Step        | Expected                                                                                                                                                                                                                                                                                          |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| check, lint | no errors                                                                                                                                                                                                                                                                                         |
+| Vitest      | every case in both spec files passes                                                                                                                                                                                                                                                              |
 | Playwright  | empty state, ranking, pagination, fuel switch, unknown fuel falls back, prices without JS, adjustment card, first-visit mode follows the device, invalid saved value ignored, saved mode kept after reload with app JS blocked, mobile menu, Coming soon pages, no third-party requests: all pass |
 
 ## By hand

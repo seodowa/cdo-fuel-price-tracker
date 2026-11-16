@@ -1,5 +1,5 @@
 ---
-description: "Task list for the public dashboard feature"
+description: 'Task list for the public dashboard feature'
 ---
 
 # Tasks: Public Dashboard
@@ -64,8 +64,8 @@ hand-computed values. `tests/e2e/dashboard.e2e.ts` passes.
 - [x] T007 [US1] Implement `joinRows` in `src/lib/dashboard-functions.ts`: build `Map`s by id, map each price row, `Math.round(price * 100)` for cents (research R4), throw an `Error` on any missing lookup. T006 passes
 - [x] T008 [US1] Write failing tests for `ageLabel(reportedAt, today)` in `src/lib/dashboard-functions.spec.ts`: same day "Reported today"; one day "Yesterday"; 12 days "12 days ago"; across a month end (`'2026-02-27'` to `'2026-03-01'` is "2 days ago"); across a year end
 - [x] T009 [US1] Implement `ageLabel` in `src/lib/dashboard-functions.ts` with `Date.UTC` on the `YYYY-MM-DD` parts and a whole-day difference (research R7). T008 passes
-- [ ] T010 [US1] Write failing tests for `rankStations(rows, category)` in `src/lib/dashboard-functions.spec.ts` (research R5): a station with Xtra Advance 91 at 6245 and Blaze 95 at 6810 appears once at 6245 with product "Xtra Advance 91" (scenario 3); a diesel-only station is absent from the kerosene ranking; order cheapest first; equal prices order by newer `reportedAt`, then brand, then "{street}, {barangay}"; two products of one station at the same price keep the one with the smaller product name; ranks are 1, 2, 3…; no rows gives `[]`
-- [ ] T011 [US1] Implement `rankStations` in `src/lib/dashboard-functions.ts`: filter by category, keep the cheapest product per `stationId`, sort with one comparator (`localeCompare(…, 'en')` for text), add `rank`. T010 passes
+- [x] T010 [US1] Write failing tests for `rankStations(rows, category)` in `src/lib/dashboard-functions.spec.ts` (research R5): a station with Xtra Advance 91 at 6245 and Blaze 95 at 6810 appears once at 6245 with product "Xtra Advance 91" (scenario 3); a diesel-only station is absent from the kerosene ranking; order cheapest first; equal prices order by newer `reportedAt`, then brand, then "{street}, {barangay}"; two products of one station at the same price keep the one with the smaller product name; ranks are 1, 2, 3…; no rows gives `[]`
+- [x] T011 [US1] Implement `rankStations` in `src/lib/dashboard-functions.ts`: filter by category, keep the cheapest product per `stationId`, sort with one comparator (`localeCompare(…, 'en')` for text), add `rank`. T010 passes
 - [ ] T012 [US1] Write failing tests in `src/lib/dashboard-functions.spec.ts` for `paginate(ranked, pageParam)`: 12 rows and `null` give 10 rows, page 1, pages 2 (scenario 1); `'2'` gives 2 rows (scenario 2); `'abc'`, `'0'` and `'9'` clamp to 1, 1 and 2; `[]` gives `{ rows: [], page: 1, pages: 1 }`. For `averageCents(ranked)`: `[6245, 6085]` gives 6165; `[6245, 6246]` gives 6246 (half up); `[]` gives `null`. For `formatCents`: 6245 gives `"62.45"`, 6000 gives `"60.00"`. For `barPercent(cents, highestCents)`: 6810 of 6810 gives 100, 6245 of 6810 gives 92, 3405 of 6810 gives 50 (FR-007)
 - [ ] T013 [US1] Implement `paginate` (page size 10, D11), `averageCents` (`Math.round(sum / count)`) `formatCents` (`(c / 100).toFixed(2)`) and `barPercent` (`Math.round(cents / highestCents * 100)`) in `src/lib/dashboard-functions.ts`. T012 passes
 - [ ] T014 [US1] Write failing tests in `src/lib/dashboard-functions.spec.ts` for `pickFuel(param, categories)` with categories `['diesel', 'gasoline', 'kerosene']`: `null` gives `'gasoline'` (FR-002 default); `'diesel'` gives `'diesel'`; an unknown value such as `'petrol'` or `'<script>'` gives `'gasoline'`; `'DIESEL'` gives `'gasoline'` (exact match only)
@@ -151,31 +151,31 @@ modes.
 
 ## FR to test map
 
-| FR | Test task (before build) | Build task |
-|---|---|---|
-| FR-001 | T021 (2) | T017, T022 |
-| FR-002 | T014, T021 (2), (7), (8) | T015, T022, T023 |
-| FR-003 | T010, T021 (3) | T011, T023 |
-| FR-004 | T008, T021 (4) | T009, T023 |
-| FR-005 | T021 (4) | T024 |
-| FR-006 | T012, T021 (2), (6) | T013, T024 |
-| FR-007 | T012 (`averageCents`, `barPercent`), T021 (5) | T013, T023, T024 |
-| FR-008 | T010, T021 (9) | T025 |
-| FR-009 | T028, T034 (T021 (1) extended, (12)) | T029, T035 |
-| FR-010 | T030, T034 | T031, T035 |
-| FR-011 | T028, T030, T034 | T029, T031, T035 |
-| FR-012 | T021 (10) | T017, T022 |
-| FR-013 | T021 (1), (9) | T024, T025 |
-| FR-014 | T016 (c), (d), T032 (c), (d); page by hand T049 (d) | T017, T018, T033 |
-| FR-015 | T037 (1), (2) | T041 (built ahead), T042 |
-| FR-016 | T037 (3) | T044, T045 |
-| FR-017 | T037 (4), (5) | T043, T046 |
-| FR-018 | T037 (6), (8) | T038, T039 |
-| FR-019 | T037 (7), (8) | T039, T042 |
-| FR-020 | by eye, T048 (D14) | T026, T038, T041 |
-| FR-021 | T037 (9) | T003 (done) |
-| FR-022 | T037 (10), T049 (a) to (c) | T040 |
-| FR-023 | T021 (11), T034, T037 (2), (4), (10) | T023, T035, T042, T043 |
+| FR     | Test task (before build)                            | Build task               |
+| ------ | --------------------------------------------------- | ------------------------ |
+| FR-001 | T021 (2)                                            | T017, T022               |
+| FR-002 | T014, T021 (2), (7), (8)                            | T015, T022, T023         |
+| FR-003 | T010, T021 (3)                                      | T011, T023               |
+| FR-004 | T008, T021 (4)                                      | T009, T023               |
+| FR-005 | T021 (4)                                            | T024                     |
+| FR-006 | T012, T021 (2), (6)                                 | T013, T024               |
+| FR-007 | T012 (`averageCents`, `barPercent`), T021 (5)       | T013, T023, T024         |
+| FR-008 | T010, T021 (9)                                      | T025                     |
+| FR-009 | T028, T034 (T021 (1) extended, (12))                | T029, T035               |
+| FR-010 | T030, T034                                          | T031, T035               |
+| FR-011 | T028, T030, T034                                    | T029, T031, T035         |
+| FR-012 | T021 (10)                                           | T017, T022               |
+| FR-013 | T021 (1), (9)                                       | T024, T025               |
+| FR-014 | T016 (c), (d), T032 (c), (d); page by hand T049 (d) | T017, T018, T033         |
+| FR-015 | T037 (1), (2)                                       | T041 (built ahead), T042 |
+| FR-016 | T037 (3)                                            | T044, T045               |
+| FR-017 | T037 (4), (5)                                       | T043, T046               |
+| FR-018 | T037 (6), (8)                                       | T038, T039               |
+| FR-019 | T037 (7), (8)                                       | T039, T042               |
+| FR-020 | by eye, T048 (D14)                                  | T026, T038, T041         |
+| FR-021 | T037 (9)                                            | T003 (done)              |
+| FR-022 | T037 (10), T049 (a) to (c)                          | T040                     |
+| FR-023 | T021 (11), T034, T037 (2), (4), (10)                | T023, T035, T042, T043   |
 
 Contract reads (columns, filters, tables): T016 (b), T032 (a) before T017 and T033.
 
