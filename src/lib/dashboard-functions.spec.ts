@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { ageLabel, joinRows, rankStations } from './dashboard-functions.ts';
+import {
+	ageLabel,
+	averageCents,
+	barPercent,
+	formatCents,
+	joinRows,
+	paginate,
+	rankStations
+} from './dashboard-functions.ts';
 import type { CategoryRow, CurrentPriceRow, ProductRow, StationRow } from './models/database.ts';
-import type { PriceRow } from './models/dashboard.ts';
+import type { PriceRow, RankedRow } from './models/dashboard.ts';
 
 // Invented stations and products, never real data
 const stations: StationRow[] = [
@@ -196,5 +204,76 @@ describe('rankStations', () => {
 
 	it('returns [] for no rows', () => {
 		expect(rankStations([], 'gasoline')).toEqual([]);
+	});
+});
+
+// Ranked rows with the given prices, ranked in the order given
+const ranked = (prices: number[]): RankedRow[] =>
+	prices.map((cents, index) => ({ ...row({ stationId: index + 1, cents }), rank: index + 1 }));
+
+describe('paginate', () => {
+	const twelve = ranked(Array.from({ length: 12 }, (_, index) => 6000 + index));
+
+	it('shows the first 10 rows on page 1 when no page is given', () => {
+		expect(paginate(twelve, null)).toEqual({ rows: twelve.slice(0, 10), page: 1, pages: 2 });
+	});
+
+	it('shows the remaining rows on the last page', () => {
+		expect(paginate(twelve, '2')).toEqual({ rows: twelve.slice(10), page: 2, pages: 2 });
+	});
+
+	it('clamps a non-numeric page to 1', () => {
+		expect(paginate(twelve, 'abc').page).toBe(1);
+	});
+
+	it('clamps page 0 to 1', () => {
+		expect(paginate(twelve, '0').page).toBe(1);
+	});
+
+	it('clamps a page past the end to the last page', () => {
+		expect(paginate(twelve, '9')).toEqual({ rows: twelve.slice(10), page: 2, pages: 2 });
+	});
+
+	it('gives one empty page for no rows', () => {
+		expect(paginate([], null)).toEqual({ rows: [], page: 1, pages: 1 });
+	});
+});
+
+describe('averageCents', () => {
+	it('averages in whole centavos', () => {
+		expect(averageCents(ranked([6245, 6085]))).toBe(6165);
+	});
+
+	it('rounds half a centavo up', () => {
+		expect(averageCents(ranked([6245, 6246]))).toBe(6246);
+	});
+
+	it('returns null for no rows', () => {
+		expect(averageCents([])).toBeNull();
+	});
+});
+
+describe('formatCents', () => {
+	it('shows pesos with two decimals', () => {
+		expect(formatCents(6245)).toBe('62.45');
+	});
+
+	it('keeps trailing zeros', () => {
+		expect(formatCents(6000)).toBe('60.00');
+	});
+});
+
+describe('barPercent', () => {
+	it('gives 100 for the highest price', () => {
+		expect(barPercent(6810, 6810)).toBe(100);
+	});
+
+	it('rounds to a whole percent', () => {
+		// 6245 / 6810 is 91.7%
+		expect(barPercent(6245, 6810)).toBe(92);
+	});
+
+	it('gives 50 for half the highest price', () => {
+		expect(barPercent(3405, 6810)).toBe(50);
 	});
 });

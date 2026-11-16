@@ -1,5 +1,8 @@
 import type { CategoryRow, CurrentPriceRow, ProductRow, StationRow } from './models/database.ts';
-import type { PriceRow, RankedRow } from './models/dashboard.ts';
+import type { Page, PriceRow, RankedRow } from './models/dashboard.ts';
+
+//  Constants
+const PAGE_SIZE = 10;
 
 // Joins each current price to its station, product and category names. A missing lookup means
 // the database broke a foreign key, so it throws instead of showing a half-empty row.
@@ -87,4 +90,31 @@ export function rankStations(rows: PriceRow[], category: string): RankedRow[] {
 			rank: index + 1
 		};
 	});
+}
+
+// pageParam comes from the URL, so anything that isn't a whole page number in range falls back
+// to the nearest valid page instead of showing an empty list
+export function paginate(ranked: RankedRow[], pageParam: string | null): Page {
+	const pages = Math.max(1, Math.ceil(ranked.length / PAGE_SIZE));
+	const requested = Number(pageParam);
+	const page = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), pages) : 1;
+	const start = (page - 1) * PAGE_SIZE;
+
+	return { rows: ranked.slice(start, start + PAGE_SIZE), page, pages };
+}
+
+// Math.round rounds half a centavo up, and the result stays a whole number of centavos
+export function averageCents(ranked: RankedRow[]): number | null {
+	if (ranked.length === 0) return null;
+	const sum = ranked.reduce((total, row) => total + row.cents, 0);
+	return Math.round(sum / ranked.length);
+}
+
+export function formatCents(cents: number): string {
+	return (cents / 100).toFixed(2);
+}
+
+// Bar width as a whole percent of the highest price on the ranking
+export function barPercent(cents: number, highestCents: number): number {
+	return Math.round((cents / highestCents) * 100);
 }
