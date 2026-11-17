@@ -6,6 +6,7 @@ import {
 	formatCents,
 	joinRows,
 	paginate,
+	pickFuel,
 	rankStations
 } from './dashboard-functions.ts';
 import type { CategoryRow, CurrentPriceRow, ProductRow, StationRow } from './models/database.ts';
@@ -215,27 +216,27 @@ describe('paginate', () => {
 	const twelve = ranked(Array.from({ length: 12 }, (_, index) => 6000 + index));
 
 	it('shows the first 10 rows on page 1 when no page is given', () => {
-		expect(paginate(twelve, null)).toEqual({ rows: twelve.slice(0, 10), page: 1, pages: 2 });
+		expect(paginate(twelve, null)).toEqual({ rows: twelve.slice(0, 10), pageNumber: 1, pages: 2 });
 	});
 
 	it('shows the remaining rows on the last page', () => {
-		expect(paginate(twelve, '2')).toEqual({ rows: twelve.slice(10), page: 2, pages: 2 });
+		expect(paginate(twelve, '2')).toEqual({ rows: twelve.slice(10), pageNumber: 2, pages: 2 });
 	});
 
 	it('clamps a non-numeric page to 1', () => {
-		expect(paginate(twelve, 'abc').page).toBe(1);
+		expect(paginate(twelve, 'abc').pageNumber).toBe(1);
 	});
 
 	it('clamps page 0 to 1', () => {
-		expect(paginate(twelve, '0').page).toBe(1);
+		expect(paginate(twelve, '0').pageNumber).toBe(1);
 	});
 
 	it('clamps a page past the end to the last page', () => {
-		expect(paginate(twelve, '9')).toEqual({ rows: twelve.slice(10), page: 2, pages: 2 });
+		expect(paginate(twelve, '9')).toEqual({ rows: twelve.slice(10), pageNumber: 2, pages: 2 });
 	});
 
 	it('gives one empty page for no rows', () => {
-		expect(paginate([], null)).toEqual({ rows: [], page: 1, pages: 1 });
+		expect(paginate([], null)).toEqual({ rows: [], pageNumber: 1, pages: 1 });
 	});
 });
 
@@ -275,5 +276,26 @@ describe('barPercent', () => {
 
 	it('gives 50 for half the highest price', () => {
 		expect(barPercent(3405, 6810)).toBe(50);
+	});
+});
+
+describe('pickFuel', () => {
+	const categories = ['diesel', 'gasoline', 'kerosene'];
+
+	it('defaults to gasoline when no fuel is given', () => {
+		expect(pickFuel(null, categories)).toBe('gasoline');
+	});
+
+	it('picks a known fuel', () => {
+		expect(pickFuel('diesel', categories)).toBe('diesel');
+	});
+
+	it('falls back to gasoline for an unknown fuel', () => {
+		expect(pickFuel('petrol', categories)).toBe('gasoline');
+		expect(pickFuel('<script>', categories)).toBe('gasoline');
+	});
+
+	it('only accepts an exact match', () => {
+		expect(pickFuel('DIESEL', categories)).toBe('gasoline');
 	});
 });

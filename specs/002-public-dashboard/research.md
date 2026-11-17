@@ -80,7 +80,7 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
 - Location (D16): ranking rows show "{street address}, {barangay}" under the brand. "Cheapest in
   CDO" rows show "{brand} · {barangay} · {age}" plus " · est." (D17), with the product name beside
   the price as in the ranking. The tie-break "location" key is "{street address}, {barangay}".
-- Pagination: `paginate(ranked, pageParam)` returns `{ rows, page, pages }`. 10 per page. `pages`
+- Pagination: `paginate(ranked, pageParam)` returns `{ rows, pageNumber, pages }`. 10 per page. `pages`
   is at least 1. A missing, non-numeric or out-of-range `pageParam` is clamped to 1 .. pages.
 - City average: `averageCents(ranked)` over all ranked rows (all pages), R4 rounding. `null` when
   there are none.

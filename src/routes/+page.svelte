@@ -1,3 +1,29 @@
+<script lang="ts">
+	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
+	import {
+		ageLabel,
+		barPercent,
+		formatCents,
+		paginate,
+		pickFuel,
+		rankStations
+	} from '#lib/dashboard-functions.ts';
+	import Pagination from '#lib/components/Pagination.svelte';
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
+
+	const fuel = $derived(pickFuel(page.url.searchParams.get('fuel'), data.categories));
+	const pageParam = $derived(page.url.searchParams.get('page'));
+	const ranked = $derived(rankStations(data.rows, fuel));
+	const current = $derived(paginate(ranked, pageParam));
+	const today = $derived(data.today);
+	
+	// Bars scale to the highest price on every page, which is the last ranked row
+	const highest = $derived(ranked.at(-1)?.cents ?? 0);
+</script>
+
 <svelte:head>
 	<title>Dashboard · CDO Fuel Price Tracker</title>
 </svelte:head>
@@ -22,9 +48,21 @@
 		<section class="card ranking" aria-labelledby="ranking-title">
 			<div class="ranking-head">
 				<h2 id="ranking-title" class="title">Station ranking</h2>
-				<!-- T023: fuel links (chips) -->
+				<div class="fuels">
+					{#each data.categories as c (c)}
+						<a
+							class="chip"
+							href={resolve(`/?fuel=${c}`)}
+							data-sveltekit-noscroll
+							aria-current={c === fuel ? 'true' : undefined}>{c}</a
+						>
+					{/each}
+				</div>
 			</div>
-			<!-- T023: <ol aria-label="Station ranking">; T024: legend, city avg, pagination -->
+
+			<Pagination page={current} {fuel} {today} {highest}/>
+
+			<!-- T024: legend, city avg -->
 		</section>
 	</div>
 </main>
@@ -97,6 +135,28 @@
 			600 20px 'Montserrat',
 			sans-serif;
 		white-space: nowrap;
+	}
+
+	.fuels {
+		display: flex;
+		gap: 6px;
+	}
+
+	.chip {
+		padding: 7px 14px;
+		border: 1px solid var(--line);
+		border-radius: 6px;
+		font-size: 12.5px;
+		font-weight: 500;
+		color: var(--muted);
+		text-decoration: none;
+		text-transform: capitalize;
+	}
+
+	.chip[aria-current='true'] {
+		background: var(--accent);
+		border-color: var(--accent);
+		color: var(--on-accent);
 	}
 
 	/* T046 */

@@ -2,7 +2,7 @@ import type { CategoryRow, CurrentPriceRow, ProductRow, StationRow } from './mod
 import type { Page, PriceRow, RankedRow } from './models/dashboard.ts';
 
 //  Constants
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 5;
 
 // Joins each current price to its station, product and category names. A missing lookup means
 // the database broke a foreign key, so it throws instead of showing a half-empty row.
@@ -97,10 +97,10 @@ export function rankStations(rows: PriceRow[], category: string): RankedRow[] {
 export function paginate(ranked: RankedRow[], pageParam: string | null): Page {
 	const pages = Math.max(1, Math.ceil(ranked.length / PAGE_SIZE));
 	const requested = Number(pageParam);
-	const page = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), pages) : 1;
-	const start = (page - 1) * PAGE_SIZE;
+	const pageNumber = Number.isInteger(requested) ? Math.min(Math.max(requested, 1), pages) : 1;
+	const start = (pageNumber - 1) * PAGE_SIZE;
 
-	return { rows: ranked.slice(start, start + PAGE_SIZE), page, pages };
+	return { rows: ranked.slice(start, start + PAGE_SIZE), pageNumber, pages };
 }
 
 // Math.round rounds half a centavo up, and the result stays a whole number of centavos
@@ -117,4 +117,10 @@ export function formatCents(cents: number): string {
 // Bar width as a whole percent of the highest price on the ranking
 export function barPercent(cents: number, highestCents: number): number {
 	return Math.round((cents / highestCents) * 100);
+}
+
+// The fuel comes from the URL, so only an exact category name is trusted; anything else shows
+// the gasoline ranking
+export function pickFuel(param: string | null, categories: string[]): string {
+	return param !== null && categories.includes(param) ? param : 'gasoline';
 }

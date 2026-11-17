@@ -17,7 +17,7 @@ export type RankedRow = PriceRow & { rank: number };
 
 export type Page = {
 	rows: RankedRow[];
-	page: number;
+	pageNumber: number;
 	pages: number;
 };
 

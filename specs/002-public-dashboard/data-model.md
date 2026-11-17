@@ -43,7 +43,7 @@ station's cheapest product in that category (D3). Order and ties: research R5.
 
 ## `Page` (output of `paginate`)
 
-`{ rows: RankedRow[]; page: number; pages: number }`. 10 rows per page, `pages ≥ 1`, `page` in
+`{ rows: RankedRow[]; pageNumber: number; pages: number }`. 10 rows per page, `pages ≥ 1`, `pageNumber` in
 1 .. `pages`.
 
 ## `Adjustment` (output of `summarizeShifts`, one per category)
