@@ -101,7 +101,8 @@ function respondWithValidData() {
 const event = {} as Parameters<typeof load>[0];
 
 async function expectLoadFailure() {
-	const failure = await load(event).then(
+	// PageServerLoad may return a plain value or a promise; Promise.resolve gives .then either way
+	const failure = await Promise.resolve(load(event)).then(
 		() => null,
 		(e: unknown) => e
 	);
