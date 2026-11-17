@@ -58,38 +58,26 @@ after. Run vitest from the repo root; running it from specs/ fails and creates a
 
 <!-- st-facts:start -->
 
-## Facts (2026-11-16 15:08:16 +0800)
+## Facts (2026-11-17 20:48:23 +0800)
 
 - Branch: development
 - Phase: build | Lane: full | Feature: 002-public-dashboard
-- Tasks: 19/50
+- Tasks: 21/50
 
 Last 5 commits:
 
 ```
+d8d1f00 feat: add station ranking card with pagination
+0a95b81 feat: Implement paginate, averageCents, formatCents, barPercent
+72136d6 feat: finish implementing rankStations() + updated unit tests
 0dc477a feat: write unit tests for rankStations
 16c7782 feat: implement ageLabel function + tests
-3bc044b feat: implement joinRow function with its respective test
-13ff9ba feat: implement error pages with illustration
-28f52db feat: add title and headings to Analytics and Contribute page + tests
 ```
 
 Uncommitted files:
 
 ```
- M .stratum/handoff.md
- M specs/002-public-dashboard/contracts/dashboard.md
- M specs/002-public-dashboard/decisions.md
- M specs/002-public-dashboard/quickstart.md
- M specs/002-public-dashboard/tasks.md
- M src/app.css
- M src/lib/components/Roadblock.svelte
- M src/lib/dashboard-functions.spec.ts
- M src/lib/dashboard-functions.ts
- M src/routes/+error.svelte
- M src/routes/analytics/+page.svelte
- M src/routes/contribute/+page.svelte
- M tests/e2e/shell.e2e.ts
+
 ```
 
 <!-- st-facts:end -->

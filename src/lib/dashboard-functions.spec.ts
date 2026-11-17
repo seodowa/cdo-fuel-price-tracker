@@ -5,6 +5,7 @@ import {
 	barPercent,
 	formatCents,
 	joinRows,
+	PAGE_SIZE,
 	paginate,
 	pickFuel,
 	rankStations
@@ -213,26 +214,36 @@ const ranked = (prices: number[]): RankedRow[] =>
 	prices.map((cents, index) => ({ ...row({ stationId: index + 1, cents }), rank: index + 1 }));
 
 describe('paginate', () => {
-	const twelve = ranked(Array.from({ length: 12 }, (_, index) => 6000 + index));
+	// Two full pages and 2 rows on the third, whatever the page size is
+	const rows = ranked(Array.from({ length: PAGE_SIZE * 2 + 2 }, (_, index) => 6000 + index));
+	const lastPage = rows.slice(PAGE_SIZE * 2);
 
-	it('shows the first 10 rows on page 1 when no page is given', () => {
-		expect(paginate(twelve, null)).toEqual({ rows: twelve.slice(0, 10), pageNumber: 1, pages: 2 });
+	it('shows the first page when no page is given', () => {
+		expect(paginate(rows, null)).toEqual({
+			rows: rows.slice(0, PAGE_SIZE),
+			pageNumber: 1,
+			pages: 3
+		});
+	});
+
+	it('shows a middle page', () => {
+		expect(paginate(rows, '2').rows).toEqual(rows.slice(PAGE_SIZE, PAGE_SIZE * 2));
 	});
 
 	it('shows the remaining rows on the last page', () => {
-		expect(paginate(twelve, '2')).toEqual({ rows: twelve.slice(10), pageNumber: 2, pages: 2 });
+		expect(paginate(rows, '3')).toEqual({ rows: lastPage, pageNumber: 3, pages: 3 });
 	});
 
 	it('clamps a non-numeric page to 1', () => {
-		expect(paginate(twelve, 'abc').pageNumber).toBe(1);
+		expect(paginate(rows, 'abc').pageNumber).toBe(1);
 	});
 
 	it('clamps page 0 to 1', () => {
-		expect(paginate(twelve, '0').pageNumber).toBe(1);
+		expect(paginate(rows, '0').pageNumber).toBe(1);
 	});
 
 	it('clamps a page past the end to the last page', () => {
-		expect(paginate(twelve, '9')).toEqual({ rows: twelve.slice(10), pageNumber: 2, pages: 2 });
+		expect(paginate(rows, '9')).toEqual({ rows: lastPage, pageNumber: 3, pages: 3 });
 	});
 
 	it('gives one empty page for no rows', () => {

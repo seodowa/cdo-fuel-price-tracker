@@ -2,7 +2,8 @@ import type { CategoryRow, CurrentPriceRow, ProductRow, StationRow } from './mod
 import type { Page, PriceRow, RankedRow } from './models/dashboard.ts';
 
 //  Constants
-const PAGE_SIZE = 5;
+// Stations per ranking page. 5 so a whole page fits on a phone screen
+export const PAGE_SIZE = 5;
 
 // Joins each current price to its station, product and category names. A missing lookup means
 // the database broke a foreign key, so it throws instead of showing a half-empty row.

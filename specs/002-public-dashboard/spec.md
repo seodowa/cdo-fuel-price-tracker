@@ -29,9 +29,9 @@ values.
 **Acceptance Scenarios**:
 
 1. **Given** 12 invented stations with gasoline prices, **When** a visitor opens the Dashboard,
-   **Then** gasoline is selected, stations 1 to 10 are listed from cheapest to most expensive, and
-   the page reads "Page 1 of 2".
-2. **Given** the ranking on page 1, **When** the visitor selects Next, **Then** stations 11 and 12
+   **Then** gasoline is selected, stations 1 to 5 are listed from cheapest to most expensive, and
+   the page reads "Page 1 of 3".
+2. **Given** the ranking on page 2, **When** the visitor selects Next, **Then** stations 11 and 12
    are shown and Next is unavailable.
 3. **Given** a station selling Xtra Advance 91 at 62.45 and Blaze 95 at 68.10, **When** gasoline
    is selected, **Then** the station appears once at 62.45 with "Xtra Advance 91" beside the price.
@@ -142,7 +142,7 @@ and to light, use the toggle, reload, and visit each tab.
   shift applied, the "est." label as text (D5).
 - **FR-005**: A legend under the ranking MUST explain that "est." means the reported price plus
   weekly adjustments since then.
-- **FR-006**: The ranking MUST show 10 stations per page with Prev and Next controls and a "Page N
+- **FR-006**: The ranking MUST show 5 stations per page with Prev and Next controls and a "Page N
   of M" label (D11).
 - **FR-007**: The ranking MUST show the city average of the ranked prices for the selected fuel and
   a bar per row scaled to the highest ranked price.

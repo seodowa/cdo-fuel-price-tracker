@@ -139,6 +139,7 @@
 		align-items: center;
 		gap: 10px;
 		justify-content: center;
+		margin-top: auto;
 	}
 
 	.step {
@@ -148,6 +149,7 @@
 		font-weight: 600;
 		color: var(--ink);
 		text-decoration: none;
+		margin-top: auto;
 	}
 
 	/* No page to go to: shown faded, and as text so it can't be clicked or focused */

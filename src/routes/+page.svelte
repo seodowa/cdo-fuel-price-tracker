@@ -1,14 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import {
-		ageLabel,
-		barPercent,
-		formatCents,
-		paginate,
-		pickFuel,
-		rankStations
-	} from '#lib/dashboard-functions.ts';
+	import { paginate, pickFuel, rankStations } from '#lib/dashboard-functions.ts';
 	import Pagination from '#lib/components/Pagination.svelte';
 	import type { PageProps } from './$types';
 
@@ -19,7 +12,7 @@
 	const ranked = $derived(rankStations(data.rows, fuel));
 	const current = $derived(paginate(ranked, pageParam));
 	const today = $derived(data.today);
-	
+
 	// Bars scale to the highest price on every page, which is the last ranked row
 	const highest = $derived(ranked.at(-1)?.cents ?? 0);
 </script>
@@ -60,7 +53,7 @@
 				</div>
 			</div>
 
-			<Pagination page={current} {fuel} {today} {highest}/>
+			<Pagination page={current} {fuel} {today} {highest} />
 
 			<!-- T024: legend, city avg -->
 		</section>
