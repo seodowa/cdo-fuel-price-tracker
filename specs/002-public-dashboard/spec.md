@@ -28,13 +28,13 @@ values.
 
 **Acceptance Scenarios**:
 
-1. **Given** 12 invented stations with gasoline prices, **When** a visitor opens the Dashboard,
+1. **Given** 15 stations with gasoline prices, **When** a visitor opens the Dashboard,
    **Then** gasoline is selected, stations 1 to 5 are listed from cheapest to most expensive, and
    the page reads "Page 1 of 3".
-2. **Given** the ranking on page 2, **When** the visitor selects Next, **Then** stations 11 and 12
+2. **Given** the ranking on page 2, **When** the visitor selects Next, **Then** stations 11 to 15
    are shown and Next is unavailable.
-3. **Given** a station selling Xtra Advance 91 at 62.45 and Blaze 95 at 68.10, **When** gasoline
-   is selected, **Then** the station appears once at 62.45 with "Xtra Advance 91" beside the price.
+3. **Given** a station selling Xtra Advance at 62.45 and XCS at 68.10, **When** gasoline
+   is selected, **Then** the station appears once at 62.45 with "Xtra Advance" beside the price.
 4. **Given** the gasoline ranking, **When** the visitor selects Diesel, **Then** the list re-ranks
    by diesel price and the diesel selection is highlighted.
 5. **Given** a price reported today with no shift applied, **When** it is shown, **Then** its row

@@ -257,9 +257,9 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
   - `supabase/fixtures/empty.sql`: `truncate public.price_shift, public.price_report,
 public.station_product, public.station, public.fuel_product, public.brand restart identity
 cascade;` (cascade also clears `submission` and `admin_log` rows that point at them).
-  - `supabase/fixtures/dashboard.sql`: invented brands, 12 gasoline stations, diesel at some,
-    kerosene at none, a two-product gasoline station (62.45 and 68.10), one report dated today, one
-    dated 12 days ago with a later shift. Dates relative to `(now() at time zone 'Asia/Manila')::date`.
+  - `supabase/fixtures/dashboard.sql`: real brands and product names with made-up stations and
+    prices; 15 gasoline, 10 diesel and 8 kerosene stations; a two-product gasoline station (62.45
+    and 68.10), reports dated today, and older reports that this week's shift turns into estimates. Dates relative to `(now() at time zone 'Asia/Manila')::date`.
 - Tests run serially: empty state first, then the fixture, then the rest. The server reads the
   database on every request, so swapping data between tests needs no restart.
 - The helper loads `.env` with Node's `process.loadEnvFile('.env')` (Node 24, no dependency), reads
