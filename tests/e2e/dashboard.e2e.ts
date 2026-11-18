@@ -239,4 +239,19 @@ test.describe('on a phone', () => {
 		await expect(diesel).toHaveAttribute('aria-current', 'true');
 		expect(await scrollY()).toBe(beforeFuel);
 	});
+
+	// The cards are stacked on a phone, so a shorter ranking would move the page under the reader
+	test('a short last page keeps the ranking card the same height', async ({ page }) => {
+		loadFixtures('empty', 'dashboard');
+		const card = page.getByRole('region', { name: 'Station ranking' });
+		const height = async () => (await card.boundingBox())?.height;
+
+		// Kerosene: 8 stations, so page 1 has 5 rows and page 2 has 3
+		await page.goto('/?fuel=kerosene');
+		const fullPage = await height();
+		await page.goto('/?fuel=kerosene&page=2');
+		await expect(page.getByText('Page 2 of 2')).toBeVisible();
+
+		expect(await height()).toBe(fullPage);
+	});
 });

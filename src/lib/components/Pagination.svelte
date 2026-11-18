@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { ageLabel, barPercent, formatCents } from '#lib/dashboard-functions.ts';
+	import { ageLabel, barPercent, formatCents, PAGE_SIZE } from '#lib/dashboard-functions.ts';
 	import type { Page } from '#lib/models/dashboard.ts';
 
 	type Props = {
@@ -17,7 +17,7 @@
 	const href = (n: number) => resolve(`/?fuel=${fuel}&page=${n}`);
 </script>
 
-<ol class="rows" aria-label="Station ranking">
+<ol class="rows" aria-label="Station ranking" style:--page-size={PAGE_SIZE}>
 	{#each page.rows as row (row.stationId)}
 		<li class="row">
 			<span class="rank">{row.rank}</span>
@@ -71,7 +71,15 @@
 </div>
 
 <style>
+	/* A fixed height, so a short last page or a fuel with few stations doesn't resize the card and
+	   move everything below it. A full page of the tallest rows (5.5rem: a phone row whose product
+	   name wraps, 88px) plus one row of allowance for names that wrap further */
 	.rows {
+		--row-height: 5.5rem;
+		flex: 1;
+		min-height: calc(var(--page-size) * var(--row-height));
+		display: grid;
+		grid-template-rows: repeat(var(--page-size), 1fr);
 		margin: 0;
 		padding: 0;
 		list-style: none;
@@ -83,7 +91,7 @@
 		display: grid;
 		grid-template-columns: 22px minmax(0, 1fr) auto;
 		gap: 8px 12px;
-		align-items: center;
+		align-content: center;
 		padding: 12px 0;
 		border-top: 1px solid var(--line);
 	}
@@ -93,6 +101,7 @@
 			500 12px 'Roboto',
 			sans-serif;
 		color: var(--muted);
+		align-self: center;
 	}
 
 	/* Long brand, street or product names wrap instead of widening the row */
@@ -119,6 +128,7 @@
 		height: 8px;
 		border-radius: 4px;
 		background: var(--soft);
+		align-self: center;
 	}
 
 	.fill {
@@ -204,6 +214,11 @@
 	/* Desktop, the Dashboard's 768px breakpoint: one line per station with the bar in its own
 	   column, as in the desktop design */
 	@media (min-width: 768px) {
+		/* A desktop row whose product name wraps (76px) */
+		.rows {
+			--row-height: 4.75rem;
+		}
+
 		.row {
 			grid-template-columns: 24px minmax(110px, 170px) minmax(60px, 1fr) 76px;
 			gap: 14px;
