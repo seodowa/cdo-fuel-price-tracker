@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { paginate, pickFuel, rankStations } from '#lib/dashboard-functions.ts';
+	import { averageCents, paginate, pickFuel, rankStations } from '#lib/dashboard-functions.ts';
 	import Pagination from '#lib/components/Pagination.svelte';
 	import type { PageProps } from './$types';
 
@@ -12,6 +12,8 @@
 	const ranked = $derived(rankStations(data.rows, fuel));
 	const current = $derived(paginate(ranked, pageParam));
 	const today = $derived(data.today);
+	// Across every page, not just the one shown; null when nothing is ranked
+	const average = $derived(averageCents(ranked));
 
 	// Bars scale to the highest price on every page, which is the last ranked row
 	const highest = $derived(ranked.at(-1)?.cents ?? 0);
@@ -53,9 +55,11 @@
 				</div>
 			</div>
 
-			<Pagination page={current} {fuel} {today} {highest} />
-
-			<!-- T024: legend, city avg -->
+			{#if average === null}
+				<p class="empty">No prices reported yet</p>
+			{:else}
+				<Pagination page={current} {fuel} {today} {highest} {average} />
+			{/if}
 		</section>
 	</div>
 </main>
@@ -130,6 +134,14 @@
 			600 20px 'Montserrat',
 			sans-serif;
 		white-space: nowrap;
+	}
+
+	.empty {
+		margin: 0;
+		padding: 12px 0;
+		border-top: 1px solid var(--line);
+		font-size: 14px;
+		color: var(--muted);
 	}
 
 	.fuels {

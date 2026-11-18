@@ -8,9 +8,10 @@
 		fuel: string;
 		today: string;
 		highest: number;
+		average: number;
 	};
 
-	let { page, fuel, today, highest }: Props = $props();
+	let { page, fuel, today, highest, average }: Props = $props();
 
 	// The page number lives in the URL, so these are plain links that also work without JavaScript
 	const href = (n: number) => resolve(`/?fuel=${fuel}&page=${n}`);
@@ -43,25 +44,31 @@
 	{/each}
 </ol>
 
-<nav class="pagination" aria-label="Ranking pages">
-	{#if page.pageNumber > 1}
-		<a class="step" href={href(page.pageNumber - 1)} data-sveltekit-noscroll
-			><span aria-hidden="true">‹</span> Prev</a
-		>
-	{:else}
-		<span class="step off"><span aria-hidden="true">‹</span> Prev</span>
-	{/if}
+<p class="legend">est. = reported price plus weekly adjustments since then</p>
 
-	<span class="count">Page {page.pageNumber} of {page.pages}</span>
+<div class="footer">
+	<span class="average">City avg ₱{formatCents(average)} · bars scaled to highest price</span>
 
-	{#if page.pageNumber < page.pages}
-		<a class="step" href={href(page.pageNumber + 1)} data-sveltekit-noscroll
-			>Next <span aria-hidden="true">›</span></a
-		>
-	{:else}
-		<span class="step off">Next <span aria-hidden="true">›</span></span>
-	{/if}
-</nav>
+	<nav class="pagination" aria-label="Ranking pages">
+		{#if page.pageNumber > 1}
+			<a class="step" href={href(page.pageNumber - 1)} data-sveltekit-noscroll
+				><span aria-hidden="true">‹</span> Prev</a
+			>
+		{:else}
+			<span class="step off"><span aria-hidden="true">‹</span> Prev</span>
+		{/if}
+
+		<span class="count">Page {page.pageNumber} of {page.pages}</span>
+
+		{#if page.pageNumber < page.pages}
+			<a class="step" href={href(page.pageNumber + 1)} data-sveltekit-noscroll
+				>Next <span aria-hidden="true">›</span></a
+			>
+		{:else}
+			<span class="step off">Next <span aria-hidden="true">›</span></span>
+		{/if}
+	</nav>
+</div>
 
 <style>
 	.rows {
@@ -134,12 +141,36 @@
 		font-weight: 400;
 	}
 
+	/* margin-top: auto pushes the legend and footer to the bottom of the card when the list is short */
+	.legend {
+		margin: auto 0 0;
+		padding-top: 12px;
+		font-size: 12px;
+		color: var(--muted);
+	}
+
+	.footer {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		align-items: center;
+		justify-content: space-between;
+		margin-top: 12px;
+		padding-top: 12px;
+		border-top: 1px solid var(--line);
+	}
+
+	.average {
+		font:
+			12px 'Roboto',
+			sans-serif;
+		color: var(--muted);
+	}
+
 	.pagination {
 		display: flex;
 		align-items: center;
 		gap: 10px;
-		justify-content: center;
-		margin-top: auto;
 	}
 
 	.step {
