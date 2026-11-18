@@ -212,3 +212,31 @@ test('(11) every ranking bar is hidden from screen readers', async ({ page }) =>
 		await expect(bar).toHaveAttribute('aria-hidden', 'true');
 	}
 });
+
+// Bug: on a phone, Next and the fuel links jumped back to the top of the page. SvelteKit 3 ignores
+// data-sveltekit-noscroll; data-sveltekit-reset="false" keeps the scroll position and focus
+test.describe('on a phone', () => {
+	test.use({ viewport: { width: 390, height: 844 } });
+
+	test('Next and the fuel links keep the scroll position', async ({ page }) => {
+		loadFixtures('empty', 'dashboard');
+		// Clicks before hydration are full page loads, which always start at the top
+		await page.goto('/', { waitUntil: 'networkidle' });
+		const scrollY = () => page.evaluate(() => window.scrollY);
+
+		const next = page.getByRole('link', { name: 'Next' });
+		await next.scrollIntoViewIfNeeded();
+		const beforeNext = await scrollY();
+		expect(beforeNext).toBeGreaterThan(0);
+		await next.click();
+		await expect(page.getByText('Page 2 of 3')).toBeVisible();
+		expect(await scrollY()).toBe(beforeNext);
+
+		const diesel = page.getByRole('link', { name: 'diesel', exact: true });
+		await diesel.scrollIntoViewIfNeeded();
+		const beforeFuel = await scrollY();
+		await diesel.click();
+		await expect(diesel).toHaveAttribute('aria-current', 'true');
+		expect(await scrollY()).toBe(beforeFuel);
+	});
+});

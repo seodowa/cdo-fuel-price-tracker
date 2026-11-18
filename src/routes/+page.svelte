@@ -80,7 +80,7 @@
 						<a
 							class="chip"
 							href={resolve(`/?fuel=${c}`)}
-							data-sveltekit-noscroll
+							data-sveltekit-reset="false"
 							aria-current={c === fuel ? 'true' : undefined}>{c}</a
 						>
 					{/each}

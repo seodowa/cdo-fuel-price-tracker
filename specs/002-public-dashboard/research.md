@@ -41,7 +41,7 @@ Open decisions were answered as D15 to D19 in `decisions.md`.
   `url.searchParams`, so SvelteKit does not rerun it when only the query string changes. The page
   reads `fuel` and `page` from `page.url.searchParams` (`$app/state`) and derives the ranking with
   `$derived`. The query value is stored as `pageParam` so it does not shadow `page` from
-  `$app/state`. Fuel buttons and Prev / Next are `<a>` links with `data-sveltekit-noscroll`.
+  `$app/state`. Fuel buttons and Prev / Next are `<a>` links with `data-sveltekit-reset="false"` (SvelteKit 3 replaced `data-sveltekit-noscroll` with it; it keeps both scroll position and focus).
 - Without JS, the links are full page loads and the server renders the chosen fuel and page.
 - `pickFuel(param, categories)` (pure, tested) returns `param` only when it exactly matches a
   category name, otherwise `gasoline`. `paginate` clamps `page` to 1 .. page count.

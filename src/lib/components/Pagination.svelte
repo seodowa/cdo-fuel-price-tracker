@@ -51,7 +51,7 @@
 
 	<nav class="pagination" aria-label="Ranking pages">
 		{#if page.pageNumber > 1}
-			<a class="step" href={href(page.pageNumber - 1)} data-sveltekit-noscroll
+			<a class="step" href={href(page.pageNumber - 1)} data-sveltekit-reset="false"
 				><span aria-hidden="true">‹</span> Prev</a
 			>
 		{:else}
@@ -61,7 +61,7 @@
 		<span class="count">Page {page.pageNumber} of {page.pages}</span>
 
 		{#if page.pageNumber < page.pages}
-			<a class="step" href={href(page.pageNumber + 1)} data-sveltekit-noscroll
+			<a class="step" href={href(page.pageNumber + 1)} data-sveltekit-reset="false"
 				>Next <span aria-hidden="true">›</span></a
 			>
 		{:else}
