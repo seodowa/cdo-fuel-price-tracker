@@ -10,8 +10,8 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
 	auth: { persistSession: false }
 });
 
-// Supabase returns at most this many rows per read (max_rows in supabase/config.toml)
-// ponytail: 1000-row ceiling per read, add .range() paging when the city passes ~250 stations
+// Supabase returns at most this many rows per read (max_rows in supabase/config.toml). Reaching it
+// fails the load; add .range() paging if the data ever grows that large
 const MAX_ROWS = 1000;
 
 // The rows of one read. An error, or a full response that may have been cut off, fails the load,

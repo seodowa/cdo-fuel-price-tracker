@@ -95,6 +95,8 @@
 	}
 
 	.ranking {
+		display: flex;
+		flex-direction: column;
 		padding: 24px 28px;
 	}
 
