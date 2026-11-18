@@ -68,20 +68,20 @@
 	.container {
 		max-width: 1280px;
 		margin: 0 auto;
-		padding: 32px 40px 48px;
+		padding: 20px 16px 36px;
 	}
 
 	/* Two equal columns when both fit at 420px, otherwise one column in source order */
 	.dashboard {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-		gap: 20px;
+		gap: 16px;
 	}
 
 	.side {
 		display: flex;
 		flex-direction: column;
-		gap: 20px;
+		gap: 16px;
 	}
 
 	.card {
@@ -101,7 +101,7 @@
 	.ranking {
 		display: flex;
 		flex-direction: column;
-		padding: 24px 28px;
+		padding: 20px 16px;
 	}
 
 	/* "PRICE ADJUSTMENT", "CHEAPEST IN CDO": the text stays sentence case for screen readers */
@@ -166,19 +166,19 @@
 		color: var(--on-accent);
 	}
 
-	/* T046 */
-	@media (max-width: 767px) {
+	/* Desktop, the Dashboard's 768px breakpoint: the roomier spacing of the desktop design */
+	@media (min-width: 768px) {
 		.container {
-			padding: 20px 16px 36px;
+			padding: 32px 40px 48px;
 		}
 
 		.dashboard,
 		.side {
-			gap: 16px;
+			gap: 20px;
 		}
 
 		.ranking {
-			padding: 20px 16px;
+			padding: 24px 28px;
 		}
 	}
 </style>

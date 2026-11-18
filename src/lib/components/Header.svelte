@@ -71,15 +71,17 @@
 	header {
 		display: flex;
 		align-items: center;
-		gap: 2rem;
-		height: 4.5rem;
-		padding: 0 2.5rem;
+		gap: 10px;
+		height: 60px;
+		padding: 0 16px;
 		border-bottom: 1px solid var(--line);
 	}
 
+	/* min-width: 0 lets the name wrap on phones instead of pushing the buttons off screen */
 	.logo {
 		display: flex;
 		align-items: center;
+		min-width: 0;
 		gap: 0.625rem;
 		font:
 			700 1.0625rem 'Montserrat',
@@ -105,9 +107,10 @@
 		background: var(--accent);
 	}
 
-	/* A class, not `nav`: display: flex on the popover would override the browser's hidden state */
+	/* Inline tabs are desktop only; phones use the menu. A class, not `nav`: display: flex on the
+	   popover would override the browser's hidden state */
 	.tabs {
-		display: flex;
+		display: none;
 		gap: 6px;
 		height: 100%;
 	}
@@ -165,7 +168,6 @@
 	}
 
 	.menu-button {
-		display: none;
 		font-size: 18px;
 	}
 
@@ -178,52 +180,54 @@
 		display: inline;
 	}
 
-	@media (max-width: 767px) {
+	.menu:popover-open {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.menu {
+		inset: 60px 0 auto 0;
+		width: auto;
+		margin: 0;
+		padding: 8px;
+		border: 0;
+		border-bottom: 1px solid var(--line);
+		background: var(--card);
+		color: var(--ink);
+		box-shadow: var(--raised);
+	}
+
+	.menu a {
+		height: auto;
+		padding: 14px 12px;
+		border-radius: 10px;
+		font-size: 15px;
+	}
+
+	.menu a[aria-current='page'] {
+		background-color: var(--soft);
+	}
+
+	/* Desktop, the 768px breakpoint: a taller header with the tabs inline and no menu */
+	@media (min-width: 768px) {
 		header {
-			gap: 10px;
-			height: 60px;
-			padding: 0 16px;
+			gap: 2rem;
+			height: 4.5rem;
+			padding: 0 2.5rem;
 		}
 
-		/* Lets the name wrap instead of pushing the buttons off screen */
 		.logo {
-			min-width: 0;
+			min-width: auto;
 		}
 
 		.tabs {
-			display: none;
-		}
-
-		.menu-button {
-			display: grid;
-		}
-
-		.menu:popover-open {
 			display: flex;
-			flex-direction: column;
 		}
 
-		.menu {
-			inset: 60px 0 auto 0;
-			width: auto;
-			margin: 0;
-			padding: 8px;
-			border: 0;
-			border-bottom: 1px solid var(--line);
-			background: var(--card);
-			color: var(--ink);
-			box-shadow: var(--raised);
-		}
-
-		.menu a {
-			height: auto;
-			padding: 14px 12px;
-			border-radius: 10px;
-			font-size: 15px;
-		}
-
-		.menu a[aria-current='page'] {
-			background-color: var(--soft);
+		/* A menu left open while the window grows past the breakpoint is hidden with its button */
+		.menu-button,
+		.menu:popover-open {
+			display: none;
 		}
 	}
 </style>

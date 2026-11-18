@@ -77,10 +77,12 @@
 		list-style: none;
 	}
 
+	/* Phones: rank, station and price on one line, the bar on its own line under the station and
+	   price, as in the mobile design */
 	.row {
 		display: grid;
-		grid-template-columns: 24px minmax(110px, 170px) minmax(60px, 1fr) 76px;
-		gap: 14px;
+		grid-template-columns: 22px minmax(0, 1fr) auto;
+		gap: 8px 12px;
 		align-items: center;
 		padding: 12px 0;
 		border-top: 1px solid var(--line);
@@ -112,14 +114,16 @@
 	}
 
 	.bar {
-		height: 10px;
-		border-radius: 5px;
+		grid-row: 2;
+		grid-column: 2 / 4;
+		height: 8px;
+		border-radius: 4px;
 		background: var(--soft);
 	}
 
 	.fill {
 		height: 100%;
-		border-radius: 5px;
+		border-radius: 4px;
 		background: var(--mid);
 	}
 
@@ -127,7 +131,10 @@
 		background: var(--accent);
 	}
 
+	/* The bar comes before the price in the markup, so pin the price to the first line */
 	.price {
+		grid-row: 1;
+		grid-column: 3;
 		font:
 			500 17px 'Roboto',
 			sans-serif;
@@ -154,7 +161,7 @@
 		flex-wrap: wrap;
 		gap: 10px;
 		align-items: center;
-		justify-content: space-between;
+		justify-content: center;
 		margin-top: 12px;
 		padding-top: 12px;
 		border-top: 1px solid var(--line);
@@ -194,28 +201,27 @@
 		color: var(--muted);
 	}
 
-	/* Same breakpoint as the rest of the Dashboard: below it the bar moves to its own line under the
-	   station and price, as in the mobile design */
-	@media (max-width: 767px) {
+	/* Desktop, the Dashboard's 768px breakpoint: one line per station with the bar in its own
+	   column, as in the desktop design */
+	@media (min-width: 768px) {
 		.row {
-			grid-template-columns: 22px minmax(0, 1fr) auto;
-			gap: 8px 12px;
+			grid-template-columns: 24px minmax(110px, 170px) minmax(60px, 1fr) 76px;
+			gap: 14px;
 		}
 
-		.price {
-			grid-row: 1;
-			grid-column: 3;
+		.price,
+		.bar {
+			grid-row: auto;
+			grid-column: auto;
 		}
 
 		.bar {
-			grid-row: 2;
-			grid-column: 2 / 4;
-			height: 8px;
-			border-radius: 4px;
+			height: 10px;
+			border-radius: 5px;
 		}
 
 		.fill {
-			border-radius: 4px;
+			border-radius: 5px;
 		}
 	}
 </style>
