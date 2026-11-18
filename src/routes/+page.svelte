@@ -1,7 +1,14 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import { averageCents, paginate, pickFuel, rankStations } from '#lib/dashboard-functions.ts';
+	import {
+		ageLabel,
+		averageCents,
+		formatCents,
+		paginate,
+		pickFuel,
+		rankStations
+	} from '#lib/dashboard-functions.ts';
 	import Pagination from '#lib/components/Pagination.svelte';
 	import type { PageProps } from './$types';
 
@@ -36,7 +43,32 @@
 
 			<section class="card cheapest" aria-labelledby="cheapest-title">
 				<h2 id="cheapest-title" class="label">Cheapest in CDO</h2>
-				<!-- T025: one row per fuel, or "No prices reported yet" -->
+				<ul class="cheapest-list">
+					{#each data.categories as c (c)}
+						<!-- Rank 1 of the same ranking the list uses, so the two never disagree -->
+						{@const top = rankStations(data.rows, c).at(0)}
+						<li class="cheapest-row">
+							<div class="cheapest-station">
+								<div class="fuel">{c}</div>
+								{#if top}
+									<div class="where">
+										{top.brand} · {top.barangay} · {ageLabel(top.reportedAt, today)}{top.isEstimate
+											? ' · est.'
+											: ''}
+									</div>
+								{:else}
+									<div class="where">No prices reported yet</div>
+								{/if}
+							</div>
+							{#if top}
+								<div class="cheapest-price">
+									₱{formatCents(top.cents)}
+									<span class="cheapest-product">{top.product}</span>
+								</div>
+							{/if}
+						</li>
+					{/each}
+				</ul>
 			</section>
 		</div>
 
@@ -117,6 +149,55 @@
 
 	.cheapest .label {
 		margin-bottom: 8px;
+	}
+
+	.cheapest-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.cheapest-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		gap: 12px;
+		padding: 10px 0;
+		border-top: 1px solid var(--line);
+	}
+
+	/* Long brand or product names wrap instead of widening the card */
+	.cheapest-station,
+	.cheapest-price {
+		min-width: 0;
+		overflow-wrap: anywhere;
+	}
+
+	.fuel {
+		font-size: 14px;
+		font-weight: 500;
+		text-transform: capitalize;
+	}
+
+	.where,
+	.cheapest-product {
+		font-size: 12px;
+		color: var(--muted);
+	}
+
+	.cheapest-price {
+		font:
+			500 22px 'Roboto',
+			sans-serif;
+		color: var(--accent);
+		text-align: right;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.cheapest-product {
+		display: block;
+		font-family: 'Inter', sans-serif;
+		font-weight: 400;
 	}
 
 	.ranking-head {
